@@ -176,6 +176,8 @@ public class Main : MonoBehaviour
 
     public bool TryProcessMatchesAtCoords(int start_x, int start_y, int dest_x, int dest_y)
     {
+        return false;
+        
         processing_list_ = new List<GridCell>();
         List<GridCell> list1 = GetMatchesAtCoords(start_x, start_y);
         List<GridCell> list2 = GetMatchesAtCoords(dest_x, dest_y);
@@ -195,6 +197,8 @@ public class Main : MonoBehaviour
 
     public bool TryProcessAllMatches()
     {
+        return false;
+        
         processing_list_ = new List<GridCell>();
         for (int x = 0; x < width_; x++)
         {

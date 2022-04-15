@@ -312,6 +312,8 @@ public class View : MonoBehaviour
     public class PipeVisual
     {
         private Transform transform_;
+        private Transform sprite_transform_;
+        private Vector3 target_euler_;
         private Main.Pipe pipe_;
         private bool is_destroyed;
         private VfxManager vfx_manager_; //[TODO] can be made into event
@@ -322,6 +324,7 @@ public class View : MonoBehaviour
             pipe_ = pipe;
             is_destroyed = false;
 
+            sprite_transform_ = transform_.Find("Sprite");
             UpdateTransformRotation();
 
             pipe_.OnDestroyed += HandlePipeDestroyedEvent;
@@ -339,6 +342,7 @@ public class View : MonoBehaviour
             Vector3 dir = target - transform_.position;
             float speed = 4.5f;
             transform_.position += dir * speed * Time.deltaTime;
+            sprite_transform_.localRotation = Quaternion.Lerp(sprite_transform_.localRotation, Quaternion.Euler(target_euler_), 2*Time.deltaTime);
         }
 
         public void UpdateTransformRotation()
@@ -346,16 +350,20 @@ public class View : MonoBehaviour
             switch (pipe_.GetRotType())
             {
                 case GlobalEnums.RotType.Rot0:
-                    transform_.rotation = Quaternion.Euler(0, 0, 0);
+                    //transform_.rotation = Quaternion.Euler(0, 0, 0);
+                    target_euler_ = new Vector3(0, 0, 0);
                     break;
                 case GlobalEnums.RotType.Rot90:
-                    transform_.rotation = Quaternion.Euler(0, 0, 90);
+                    //transform_.rotation = Quaternion.Euler(0, 0, 90);
+                    target_euler_ = new Vector3(0, 0, 90);
                     break;
                 case GlobalEnums.RotType.Rot180:
-                    transform_.rotation = Quaternion.Euler(0, 0, 180);
+                    //transform_.rotation = Quaternion.Euler(0, 0, 180);
+                    target_euler_ = new Vector3(0, 0, 180);
                     break;
                 case GlobalEnums.RotType.Rot270:
-                    transform_.rotation = Quaternion.Euler(0, 0, 270);
+                    //transform_.rotation = Quaternion.Euler(0, 0, 270);
+                    target_euler_ = new Vector3(0, 0, 270);
                     break;
                 default:
                     break;
