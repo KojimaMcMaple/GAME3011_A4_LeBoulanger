@@ -29,7 +29,7 @@ public class Main : MonoBehaviour
     private Grid<GridCell> grid_;
     private int width_;
     private int height_;
-    [SerializeField] private List<GemSO> gem_so_list_;
+    [SerializeField] private List<PipeSO> gem_so_list_;
     private List<GridCell> processing_list_;
 
     private int score_;
@@ -62,7 +62,7 @@ public class Main : MonoBehaviour
                         num_immoveables_++;
                     }
                 }
-                GemSO gem_so = gem_so_list_[idx];
+                PipeSO gem_so = gem_so_list_[idx];
                 Gem gem = new Gem(gem_so, x, y);
                 grid_.GetValue(x,y).SetCellItem(gem);
             }
@@ -107,7 +107,7 @@ public class Main : MonoBehaviour
         return true;
     }
 
-    private GemSO GetGemSOAtCoords(int x, int y)
+    private PipeSO GetGemSOAtCoords(int x, int y)
     {
         if (!IsValidCoords(x, y))
         {
@@ -301,7 +301,7 @@ public class Main : MonoBehaviour
                 GridCell cell = grid_.GetValue(x, y);
                 if (!cell.HasCellItem())
                 {
-                    GemSO gem_so = gem_so_list_[UnityEngine.Random.Range(0, gem_so_list_.Count-1)]; //no immoveable when spawning new
+                    PipeSO gem_so = gem_so_list_[UnityEngine.Random.Range(0, gem_so_list_.Count-1)]; //no immoveable when spawning new
                     Gem gem = new Gem(gem_so, x, y);
                     cell.SetCellItem(gem);
 
@@ -317,7 +317,7 @@ public class Main : MonoBehaviour
 
     public List<GridCell> GetMatchesAtCoords(int x, int y) //main check
     {
-        GemSO gem_so = GetGemSOAtCoords(x, y);
+        PipeSO gem_so = GetGemSOAtCoords(x, y);
         if (gem_so == null)
         {
             return null;
@@ -335,7 +335,7 @@ public class Main : MonoBehaviour
             {
                 break;
             }
-            GemSO next_gem_so = GetGemSOAtCoords(x + i, y);
+            PipeSO next_gem_so = GetGemSOAtCoords(x + i, y);
             if (next_gem_so != gem_so || next_gem_so.is_immovable)
             {
                 break;
@@ -352,7 +352,7 @@ public class Main : MonoBehaviour
             {
                 break;
             }
-            GemSO next_gem_so = GetGemSOAtCoords(x - i, y);
+            PipeSO next_gem_so = GetGemSOAtCoords(x - i, y);
             if (next_gem_so != gem_so || next_gem_so.is_immovable)
             {
                 break;
@@ -368,7 +368,7 @@ public class Main : MonoBehaviour
             {
                 break;
             }
-            GemSO next_gem_so = GetGemSOAtCoords(x, y + i);
+            PipeSO next_gem_so = GetGemSOAtCoords(x, y + i);
             if (next_gem_so != gem_so || next_gem_so.is_immovable)
             {
                 break;
@@ -384,7 +384,7 @@ public class Main : MonoBehaviour
             {
                 break;
             }
-            GemSO next_gem_so = GetGemSOAtCoords(x, y - i);
+            PipeSO next_gem_so = GetGemSOAtCoords(x, y - i);
             if (next_gem_so != gem_so || next_gem_so.is_immovable)
             {
                 break;
@@ -489,12 +489,12 @@ public class Main : MonoBehaviour
     {
         public event EventHandler OnDestroyed;
 
-        private GemSO gem_;
+        private PipeSO gem_;
         private int x_;
         private int y_;
         private bool is_dead_;
 
-        public Gem(GemSO gem, int x, int y)
+        public Gem(PipeSO gem, int x, int y)
         {
             gem_ = gem;
             x_ = x;
@@ -502,7 +502,7 @@ public class Main : MonoBehaviour
             is_dead_ = false;
         }
 
-        public GemSO GetGemSO()
+        public PipeSO GetGemSO()
         {
             return gem_;
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu()]
-public class GemSO : ScriptableObject
+public class PipeSO : ScriptableObject
 {
     public string gem_name;
     public GameObject prefab;
