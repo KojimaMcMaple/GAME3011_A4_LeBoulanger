@@ -4,17 +4,41 @@ using UnityEngine;
 
 public class PathGenerator : MonoBehaviour
 {
+    private void Start()
+    {
+        Vector2Int endSpot;
+        List<Vector2Int> a = GeneratePath(Vector2Int.zero ,15,15, 35, out endSpot);
+            if(a.Count >=  9 )
+                print("a was completed");
+            else print("a was only " + a.Count + " spaces");
+        List<Vector2Int> b = GeneratePath(Vector2Int.zero ,15,15, 20, out endSpot);
+        if (b.Count >= 9)
+            print("b was completed");
+        else print("b was only " + b.Count + " spaces");
+        List<Vector2Int> c = GeneratePath(Vector2Int.zero ,15,15, 25, out endSpot);
+        if (c.Count >= 9)
+            print("c was completed");
+        else print("c was only " + c.Count + " spaces");
+        List<Vector2Int> d = GeneratePath(Vector2Int.zero ,15,15, 30, out endSpot);
+        if (d.Count >= 9)
+            print("d was completed");
+        else print("d was only " + d.Count + " spaces");
+            
+        foreach(Vector2Int i in a)
+                print(i);
+    }
+
     //returns a list of directions for the path to go in. can overlap(which should cause a branching pipe)
     //might return early if it failed to find a path
     public List<Vector2Int> GeneratePath(Vector2Int startPos, int width, int height, int pathLength, out Vector2Int lastAddedNode)
     {
 
         List<Vector2Int> path = new List<Vector2Int>(pathLength);
+        List<Vector2Int> dir = new List<Vector2Int>(pathLength);
 
         Vector2Int currentPos = startPos;
         path.Add(currentPos);
 
-        List<Vector2Int> dirs = new List<Vector2Int>() { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
         lastAddedNode = Vector2Int.zero;
 
 
@@ -22,9 +46,10 @@ public class PathGenerator : MonoBehaviour
 
         for (int i = 1; i < pathLength; i++)
         {
-            List<Vector2Int> possible = dirs;
+            List<Vector2Int> possible = new List<Vector2Int>() { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+            
 
-            //step one: removing the directions that it cant go in (there will always be at least one direction to go in)
+            //step one: removing the directions that it cant go in
 
             if (currentPos.x <= 0 || currentPos + Vector2Int.left == lastAddedNode)
                 possible.Remove(Vector2Int.left);
@@ -36,7 +61,8 @@ public class PathGenerator : MonoBehaviour
                 possible.Remove(Vector2Int.up);
 
             //Step 2 get a random direction from the remaining directions, we'll use to update the grid position
-
+            if (possible.Count <= 0)
+                return dir;
             int random = Random.Range(0, possible.Count);
             Vector2Int newPos = currentPos + possible[random];
 
@@ -50,10 +76,14 @@ public class PathGenerator : MonoBehaviour
                 {
                     //start over, or return early if no other paths are available
                     while (overlappingTiles > 0)
-                        path.RemoveAt(--i);
+                    { 
+                        overlappingTiles--;
+                        path.RemoveAt(path.Count-1);
+                        dir.RemoveAt(dir.Count-1);
+                    }
                     possible.Remove(possible[random]);
                     if (possible.Count <= 0)
-                        return convertToDirections(path);
+                        return dir;
 
                     //pick a new direction and we'll see how things got this time
                     random = Random.Range(0, possible.Count);
@@ -63,16 +93,18 @@ public class PathGenerator : MonoBehaviour
 
                 overlappingTiles++;
                 path.Add(newPos);
+                dir.Add(possible[random]);
                 newPos += possible[random];
             }
             i += overlappingTiles;
 
             path.Add(newPos);
+            dir.Add(possible[random]);
             currentPos = newPos;
-            lastAddedNode = path[i];
+            lastAddedNode = path[i-1];
         }
 
-        return convertToDirections(path);
+        return dir;
     }
 
     bool OutOfBoundsCheck(Vector2Int pos, int w, int h)
@@ -81,15 +113,6 @@ public class PathGenerator : MonoBehaviour
 
     }
 
-    //converts positions on the grid to cardinal directions
-     List<Vector2Int> convertToDirections(List<Vector2Int> positions)
-    {
-        List<Vector2Int> dir = new List<Vector2Int>(positions.Count);
-        for(int i = 1; i < positions.Count; i++)
-        {
-            dir.Add(positions[i] - positions[i-1]);
-        }
-        return dir;
-    }
+ 
 
 }
