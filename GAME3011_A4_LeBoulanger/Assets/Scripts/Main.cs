@@ -16,7 +16,7 @@ public class Main : MonoBehaviour
 
     public class OnNewPipeSpawnedEventArgs : EventArgs
     {
-        public Pipe gem;
+        public Pipe pipe;
         public GridCell cell;
     }
 
@@ -62,9 +62,9 @@ public class Main : MonoBehaviour
                         num_immoveables_++;
                     }
                 }
-                PipeSO gem_so = pipe_so_list_[idx];
-                Pipe gem = new Pipe(gem_so, x, y);
-                grid_.GetValue(x,y).SetCellItem(gem);
+                PipeSO pipe_so = pipe_so_list_[idx];
+                Pipe pipe = new Pipe(pipe_so, x, y, (GlobalEnums.RotType)UnityEngine.Random.Range((int)GlobalEnums.RotType.Rot0, (int)GlobalEnums.RotType.NUM_OF_TYPES)); //rand rot);
+                grid_.GetValue(x,y).SetCellItem(pipe);
             }
         }
         score_ = 0;
@@ -263,7 +263,7 @@ public class Main : MonoBehaviour
         }
     }
 
-    public void DoGemsFall()
+    public void DoPipesFall()
     {
         for (int x = 0; x < width_; x++)
         {
@@ -292,7 +292,7 @@ public class Main : MonoBehaviour
         }
     }
 
-    public void DoSpawnNewGems()
+    public void DoSpawnNewPipes()
     {
         for (int x = 0; x < width_; x++)
         {
@@ -301,13 +301,13 @@ public class Main : MonoBehaviour
                 GridCell cell = grid_.GetValue(x, y);
                 if (!cell.HasCellItem())
                 {
-                    PipeSO gem_so = pipe_so_list_[UnityEngine.Random.Range(0, pipe_so_list_.Count-1)]; //no immoveable when spawning new
-                    Pipe gem = new Pipe(gem_so, x, y);
-                    cell.SetCellItem(gem);
+                    PipeSO pipe_so = pipe_so_list_[UnityEngine.Random.Range(0, pipe_so_list_.Count-1)]; //no immoveable when spawning new
+                    Pipe pipe = new Pipe(pipe_so, x, y, (GlobalEnums.RotType)UnityEngine.Random.Range((int)GlobalEnums.RotType.Rot0, (int)GlobalEnums.RotType.NUM_OF_TYPES)); //rand rot
+                    cell.SetCellItem(pipe);
 
-                    OnNewPipeSpawned?.Invoke(gem, new OnNewPipeSpawnedEventArgs
+                    OnNewPipeSpawned?.Invoke(pipe, new OnNewPipeSpawnedEventArgs
                     {
-                        gem = gem,
+                        pipe = pipe,
                         cell = cell,
                     });
                 }
@@ -533,6 +533,16 @@ public class Main : MonoBehaviour
         public override string ToString()
         {
             return is_dead_.ToString();
+        }
+
+        public GlobalEnums.RotType GetRotType()
+        {
+            return rot_type_;
+        }
+
+        public void SetRotType(GlobalEnums.RotType value)
+        {
+            rot_type_ = value;
         }
 
         public int GetBitmask()

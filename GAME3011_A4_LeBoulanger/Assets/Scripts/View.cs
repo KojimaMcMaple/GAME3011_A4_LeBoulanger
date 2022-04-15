@@ -131,10 +131,10 @@ public class View : MonoBehaviour
                 {
                     SetBusyState(0.33f, () =>
                     {
-                        model_.DoGemsFall();
+                        model_.DoPipesFall();
                         SetBusyState(0.33f, () =>
                         {
-                            model_.DoSpawnNewGems();
+                            model_.DoSpawnNewPipes();
                             SetBusyState(0.5f, () => state_ = (State.kProcessing));
                         });
                     });
@@ -170,9 +170,9 @@ public class View : MonoBehaviour
             for (int y = 0; y < grid_.GetHeight(); y++)
             {
                 Main.GridCell cell = grid_.GetValue(x, y);
-                Main.Pipe gem = cell.GetCellItem();
+                Main.Pipe pipe = cell.GetCellItem();
 
-                CreatePipeVisualAtWorldPos(grid_.GetWorldPos(x, y), gem);
+                CreatePipeVisualAtWorldPos(grid_.GetWorldPos(x, y), pipe);
 
                 Instantiate(cell_visual_template_, grid_.GetWorldPos(x, y), Quaternion.identity);
             }
@@ -199,9 +199,9 @@ public class View : MonoBehaviour
             scene_pipe.Find("Sprite").GetComponent<Animator>().runtimeAnimatorController = pipe.GetPipeSO().prefab.GetComponent<Animator>().runtimeAnimatorController;
         }
         
-        PipeVisual gem_visual = new PipeVisual(scene_pipe, pipe);
+        PipeVisual pipe_visual = new PipeVisual(scene_pipe, pipe);
 
-        pipe_dict_[pipe] = gem_visual;
+        pipe_dict_[pipe] = pipe_visual;
 
         return scene_pipe;
     }
@@ -275,7 +275,7 @@ public class View : MonoBehaviour
 
     private void HandleNewPipeSpawnedEvent(object sender, Main.OnNewPipeSpawnedEventArgs e)
     {
-        CreatePipeVisualAtWorldPos(e.cell.GetWorldPos(), e.gem);
+        CreatePipeVisualAtWorldPos(e.cell.GetWorldPos(), e.pipe);
     }
 
     private void HandleBombSpawnedEvent(object sender, Main.OnBombSpawnedEventArgs e)
@@ -322,6 +322,8 @@ public class View : MonoBehaviour
             pipe_ = pipe;
             is_destroyed = false;
 
+            UpdateTransformRotation();
+
             pipe_.OnDestroyed += HandlePipeDestroyedEvent;
 
             vfx_manager_ = FindObjectOfType<VfxManager>();
@@ -337,6 +339,27 @@ public class View : MonoBehaviour
             Vector3 dir = target - transform_.position;
             float speed = 4.5f;
             transform_.position += dir * speed * Time.deltaTime;
+        }
+
+        public void UpdateTransformRotation()
+        {
+            switch (pipe_.GetRotType())
+            {
+                case GlobalEnums.RotType.Rot0:
+                    transform_.rotation = Quaternion.Euler(0, 0, 0);
+                    break;
+                case GlobalEnums.RotType.Rot90:
+                    transform_.rotation = Quaternion.Euler(0, 0, 90);
+                    break;
+                case GlobalEnums.RotType.Rot180:
+                    transform_.rotation = Quaternion.Euler(0, 0, 180);
+                    break;
+                case GlobalEnums.RotType.Rot270:
+                    transform_.rotation = Quaternion.Euler(0, 0, 270);
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void HandlePipeDestroyedEvent(object sender, System.EventArgs e)

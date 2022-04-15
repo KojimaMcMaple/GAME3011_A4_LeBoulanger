@@ -1387,7 +1387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7959d74d285f55c42b73d289ef57f234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pipe_visual_template_: {fileID: 0}
+  pipe_visual_template_: {fileID: 5063645444767931003, guid: bc06c11483d9aca4c962078dad1ce233, type: 3}
   cell_visual_template_: {fileID: 1644153913859304229, guid: c0f01f39a7d0b4b42a8f6f6d624db573, type: 3}
   start_pos_y_: 14
   level_txt_: {fileID: 937215065}
