@@ -8,13 +8,13 @@ using TMPro;
 
 public class View : MonoBehaviour
 {
-    [SerializeField] private Transform gem_visual_template_;
+    [SerializeField] private Transform pipe_visual_template_;
     [SerializeField] private Transform cell_visual_template_;
     [SerializeField] private float start_pos_y_ = 14f;
 
     private Main model_;
     private Grid<Main.GridCell> grid_;
-    private Dictionary<Main.Gem, GemVisual> gem_dict_; //linker between model and view
+    private Dictionary<Main.Pipe, GemVisual> gem_dict_; //linker between model and view
     private State state_;
     private float busy_timer_;
 
@@ -159,18 +159,18 @@ public class View : MonoBehaviour
         cam_.position = new Vector3(grid_.GetWidth() *.5f, grid_.GetHeight() * .5f + cam_offset_y, cam_.position.z);
 
         model_.OnGridCellDestroyed += HandleGridCellDestroyedEvent;
-        model_.OnNewGemSpawned += HandleNewGemSpawnedEvent;
+        model_.OnNewPipeSpawned += HandleNewGemSpawnedEvent;
         model_.OnBombSpawned += HandleBombSpawnedEvent;
         model_.OnWin += HandleWinEvent;
         model_.OnLoss += HandleLossEvent;
 
-        gem_dict_ = new Dictionary<Main.Gem, GemVisual>();
+        gem_dict_ = new Dictionary<Main.Pipe, GemVisual>();
         for (int x = 0; x < grid_.GetWidth(); x++)
         {
             for (int y = 0; y < grid_.GetHeight(); y++)
             {
                 Main.GridCell cell = grid_.GetValue(x, y);
-                Main.Gem gem = cell.GetCellItem();
+                Main.Pipe gem = cell.GetCellItem();
 
                 CreateGemVisualAtWorldPos(grid_.GetWorldPos(x, y), gem);
 
@@ -184,31 +184,31 @@ public class View : MonoBehaviour
     /// Instantiate gem_visual_template_ at pos and link new GemVisual to gem
     /// </summary>
     /// <param name="pos"></param>
-    /// <param name="gem"></param>
+    /// <param name="pipe"></param>
     /// <returns></returns>
-    private Transform CreateGemVisualAtWorldPos(Vector3 pos, Main.Gem gem)
+    private Transform CreateGemVisualAtWorldPos(Vector3 pos, Main.Pipe pipe)
     {
         Vector3 position = pos;
         position = new Vector3(position.x, start_pos_y_); //move gem way up at the start
 
-        Transform scene_gem = Instantiate(gem_visual_template_, position, Quaternion.identity);
-        scene_gem.Find("Sprite").GetComponent<SpriteRenderer>().sprite = gem.GetGemSO().prefab.GetComponent<SpriteRenderer>().sprite;
-        scene_gem.Find("Sprite").GetComponent<SpriteRenderer>().material = gem.GetGemSO().prefab.GetComponent<SpriteRenderer>().sharedMaterial;
-        if (gem.GetGemSO().prefab.GetComponent<Animator>().runtimeAnimatorController != null)
+        Transform scene_gem = Instantiate(pipe_visual_template_, position, Quaternion.identity);
+        scene_gem.Find("Sprite").GetComponent<SpriteRenderer>().sprite = pipe.GetPipeSO().prefab.GetComponent<SpriteRenderer>().sprite;
+        scene_gem.Find("Sprite").GetComponent<SpriteRenderer>().material = pipe.GetPipeSO().prefab.GetComponent<SpriteRenderer>().sharedMaterial;
+        if (pipe.GetPipeSO().prefab.GetComponent<Animator>().runtimeAnimatorController != null)
         {
-            scene_gem.Find("Sprite").GetComponent<Animator>().runtimeAnimatorController = gem.GetGemSO().prefab.GetComponent<Animator>().runtimeAnimatorController;
+            scene_gem.Find("Sprite").GetComponent<Animator>().runtimeAnimatorController = pipe.GetPipeSO().prefab.GetComponent<Animator>().runtimeAnimatorController;
         }
         
-        GemVisual gem_visual = new GemVisual(scene_gem, gem);
+        GemVisual gem_visual = new GemVisual(scene_gem, pipe);
 
-        gem_dict_[gem] = gem_visual;
+        gem_dict_[pipe] = gem_visual;
 
         return scene_gem;
     }
 
     private void DoUpdateView()
     {
-        foreach (Main.Gem gem in gem_dict_.Keys)
+        foreach (Main.Pipe gem in gem_dict_.Keys)
         {
             gem_dict_[gem].DoUpdate();
         }
@@ -273,7 +273,7 @@ public class View : MonoBehaviour
         }
     }
 
-    private void HandleNewGemSpawnedEvent(object sender, Main.OnNewGemSpawnedEventArgs e)
+    private void HandleNewGemSpawnedEvent(object sender, Main.OnNewPipeSpawnedEventArgs e)
     {
         CreateGemVisualAtWorldPos(e.cell.GetWorldPos(), e.gem);
     }
@@ -312,11 +312,11 @@ public class View : MonoBehaviour
     public class GemVisual
     {
         private Transform transform_;
-        private Main.Gem gem_;
+        private Main.Pipe gem_;
         private bool is_destroyed;
         private VfxManager vfx_manager_; //[TODO] can be made into event
 
-        public GemVisual(Transform t, Main.Gem gem)
+        public GemVisual(Transform t, Main.Pipe gem)
         {
             transform_ = t;
             gem_ = gem;

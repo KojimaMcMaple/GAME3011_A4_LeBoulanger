@@ -8,20 +8,30 @@
 /// </summary>
 public static class GlobalEnums
 {
-    public enum ObjType
+    public enum LineTileType
     {
-        DEFAULT,
-        PLAYER,
-        ENEMY,
-        BOSS,
+        Nub,
+        Line,
+        Corner,
+        Threeway,
+        Cross,
         NUM_OF_TYPES
     };
 
-    public enum FlinchType
+    public enum RotationType
     {
-        NO_FLINCH = -1,
-        DEFAULT,
-        ABSOLUTE,
+        Rotation0,
+        Rotation90,
+        Rotation180,
+        Rotation270,
+        NUM_OF_TYPES
+    };
+
+    public enum TileConnectionType
+    {
+        Invalid, //mismatch
+        ValidWithOpenSide, // The tiles don't directly connect, but not because of an unmatched edge.
+        ValidWithSolidMatch, // The tiles directly connect.
         NUM_OF_TYPES
     };
 
@@ -32,27 +42,5 @@ public static class GlobalEnums
         GEM_CLEAR,
         BOMB,
         NUM_OF_TYPES
-    };
-
-    public enum EnemyState
-    {
-        IDLE,
-        MOVE_TO_TARGET,
-        ATTACK,
-        FLEE,
-        STUNNED,
-        DIE,
-        NUM_OF_STATES
-    };
-
-    public enum MovingPlatformDir
-    {
-        HORIZONTAL,
-        VERTICAL,
-        UP_RIGHT,
-        DOWN_RIGHT,
-        UP_LEFT,
-        DOWN_LEFT,
-        NUM_OF_DIR,
     };
 }

@@ -7,16 +7,16 @@ using UnityEngine;
 public class Main : MonoBehaviour
 {
     public event EventHandler OnGridCellDestroyed; //event to send command from model to view
-    public event EventHandler<OnNewGemSpawnedEventArgs> OnNewGemSpawned; //event to send command from model to view
+    public event EventHandler<OnNewPipeSpawnedEventArgs> OnNewPipeSpawned; //event to send command from model to view
     public event EventHandler<OnBombSpawnedEventArgs> OnBombSpawned; //event to send command from model to view
     public event EventHandler OnScoreChanged;
     public event EventHandler OnTimerChanged;
     public event EventHandler OnWin;
     public event EventHandler OnLoss;
 
-    public class OnNewGemSpawnedEventArgs : EventArgs
+    public class OnNewPipeSpawnedEventArgs : EventArgs
     {
-        public Gem gem;
+        public Pipe gem;
         public GridCell cell;
     }
 
@@ -29,7 +29,7 @@ public class Main : MonoBehaviour
     private Grid<GridCell> grid_;
     private int width_;
     private int height_;
-    [SerializeField] private List<PipeSO> gem_so_list_;
+    [SerializeField] private List<PipeSO> pipe_so_list_;
     private List<GridCell> processing_list_;
 
     private int score_;
@@ -49,7 +49,7 @@ public class Main : MonoBehaviour
         {
             for (int y = 0; y < height_; y++)
             {
-                int max_count = gem_so_list_.Count;
+                int max_count = pipe_so_list_.Count;
                 if (num_immoveables_ >= max_immoveables_)
                 {
                     max_count -= 1;
@@ -57,13 +57,13 @@ public class Main : MonoBehaviour
                 int idx = UnityEngine.Random.Range(0, max_count);
                 if (num_immoveables_ < max_immoveables_)
                 {
-                    if (idx == gem_so_list_.Count-1)
+                    if (idx == pipe_so_list_.Count-1)
                     {
                         num_immoveables_++;
                     }
                 }
-                PipeSO gem_so = gem_so_list_[idx];
-                Gem gem = new Gem(gem_so, x, y);
+                PipeSO gem_so = pipe_so_list_[idx];
+                Pipe gem = new Pipe(gem_so, x, y);
                 grid_.GetValue(x,y).SetCellItem(gem);
             }
         }
@@ -107,14 +107,14 @@ public class Main : MonoBehaviour
         return true;
     }
 
-    private PipeSO GetGemSOAtCoords(int x, int y)
+    private PipeSO GetPipeSOAtCoords(int x, int y)
     {
         if (!IsValidCoords(x, y))
         {
             return null;
         }
         GridCell cell = grid_.GetValue(x, y);
-        return cell.GetCellItem().GetGemSO();
+        return cell.GetCellItem().GetPipeSO();
     }
 
     public bool HasMatch(int x, int y)
@@ -136,11 +136,11 @@ public class Main : MonoBehaviour
 
         GridCell start_cell = grid_.GetValue(start_x, start_y);
         GridCell dest_cell = grid_.GetValue(dest_x, dest_y);
-        Gem start_gem = start_cell.GetCellItem();
-        Gem dest_gem = dest_cell.GetCellItem();
+        Pipe start_gem = start_cell.GetCellItem();
+        Pipe dest_gem = dest_cell.GetCellItem();
 
-        start_gem.SetGemCoords(dest_x, dest_y);
-        dest_gem.SetGemCoords(start_x, start_y);
+        start_gem.SetPipeCoords(dest_x, dest_y);
+        dest_gem.SetPipeCoords(start_x, start_y);
         start_cell.SetCellItem(dest_gem);
         dest_cell.SetCellItem(start_gem);
     }
@@ -155,11 +155,11 @@ public class Main : MonoBehaviour
         {
             return false;
         }
-        if (GetGemSOAtCoords(start_x, start_y) == GetGemSOAtCoords(dest_x, dest_y))
+        if (GetPipeSOAtCoords(start_x, start_y) == GetPipeSOAtCoords(dest_x, dest_y))
         {
             return false;
         }
-        if (GetGemSOAtCoords(start_x, start_y).is_immovable || GetGemSOAtCoords(dest_x, dest_y).is_immovable)
+        if (GetPipeSOAtCoords(start_x, start_y).is_immovable || GetPipeSOAtCoords(dest_x, dest_y).is_immovable)
         {
             return false;
         }
@@ -277,7 +277,7 @@ public class Main : MonoBehaviour
                         GridCell cell_below = grid_.GetValue(x, i);
                         if (!cell_below.HasCellItem()) //move cell down
                         {
-                            cell.GetCellItem().SetGemCoords(x, i);
+                            cell.GetCellItem().SetPipeCoords(x, i);
                             cell_below.SetCellItem(cell.GetCellItem());
                             cell.ClearCellItem();
                             cell = cell_below;
@@ -301,11 +301,11 @@ public class Main : MonoBehaviour
                 GridCell cell = grid_.GetValue(x, y);
                 if (!cell.HasCellItem())
                 {
-                    PipeSO gem_so = gem_so_list_[UnityEngine.Random.Range(0, gem_so_list_.Count-1)]; //no immoveable when spawning new
-                    Gem gem = new Gem(gem_so, x, y);
+                    PipeSO gem_so = pipe_so_list_[UnityEngine.Random.Range(0, pipe_so_list_.Count-1)]; //no immoveable when spawning new
+                    Pipe gem = new Pipe(gem_so, x, y);
                     cell.SetCellItem(gem);
 
-                    OnNewGemSpawned?.Invoke(gem, new OnNewGemSpawnedEventArgs
+                    OnNewPipeSpawned?.Invoke(gem, new OnNewPipeSpawnedEventArgs
                     {
                         gem = gem,
                         cell = cell,
@@ -317,7 +317,7 @@ public class Main : MonoBehaviour
 
     public List<GridCell> GetMatchesAtCoords(int x, int y) //main check
     {
-        PipeSO gem_so = GetGemSOAtCoords(x, y);
+        PipeSO gem_so = GetPipeSOAtCoords(x, y);
         if (gem_so == null)
         {
             return null;
@@ -335,7 +335,7 @@ public class Main : MonoBehaviour
             {
                 break;
             }
-            PipeSO next_gem_so = GetGemSOAtCoords(x + i, y);
+            PipeSO next_gem_so = GetPipeSOAtCoords(x + i, y);
             if (next_gem_so != gem_so || next_gem_so.is_immovable)
             {
                 break;
@@ -352,7 +352,7 @@ public class Main : MonoBehaviour
             {
                 break;
             }
-            PipeSO next_gem_so = GetGemSOAtCoords(x - i, y);
+            PipeSO next_gem_so = GetPipeSOAtCoords(x - i, y);
             if (next_gem_so != gem_so || next_gem_so.is_immovable)
             {
                 break;
@@ -368,7 +368,7 @@ public class Main : MonoBehaviour
             {
                 break;
             }
-            PipeSO next_gem_so = GetGemSOAtCoords(x, y + i);
+            PipeSO next_gem_so = GetPipeSOAtCoords(x, y + i);
             if (next_gem_so != gem_so || next_gem_so.is_immovable)
             {
                 break;
@@ -384,7 +384,7 @@ public class Main : MonoBehaviour
             {
                 break;
             }
-            PipeSO next_gem_so = GetGemSOAtCoords(x, y - i);
+            PipeSO next_gem_so = GetPipeSOAtCoords(x, y - i);
             if (next_gem_so != gem_so || next_gem_so.is_immovable)
             {
                 break;
@@ -426,9 +426,9 @@ public class Main : MonoBehaviour
 
 
 
-    public class GridCell
+    public class GridCell //the Grid will be populated with GridCell, the item on a GridCell is a cell_item_ (class Pipe) 
     {
-        private Gem cell_item_; //item on cell
+        private Pipe cell_item_; //item on cell
 
         private Grid<GridCell> grid_;
         private int x_;
@@ -441,11 +441,11 @@ public class Main : MonoBehaviour
             y_ = y;
         }
 
-        public Gem GetCellItem()
+        public Pipe GetCellItem()
         {
             return cell_item_;
         }
-        public void SetCellItem(Gem cell_item)
+        public void SetCellItem(Pipe cell_item)
         {
             cell_item_ = cell_item;
             grid_.DoTriggerGridObjChanged(x_, y_);
@@ -485,26 +485,26 @@ public class Main : MonoBehaviour
 
 
 
-    public class Gem
+    public class Pipe //the item on a GridCell
     {
         public event EventHandler OnDestroyed;
 
-        private PipeSO gem_;
+        private PipeSO pipe_;
         private int x_;
         private int y_;
         private bool is_dead_;
 
-        public Gem(PipeSO gem, int x, int y)
+        public Pipe(PipeSO pipe, int x, int y)
         {
-            gem_ = gem;
+            pipe_ = pipe;
             x_ = x;
             y_ = y;
             is_dead_ = false;
         }
 
-        public PipeSO GetGemSO()
+        public PipeSO GetPipeSO()
         {
-            return gem_;
+            return pipe_;
         }
 
         public Vector3 GetWorldPos()
@@ -512,7 +512,7 @@ public class Main : MonoBehaviour
             return new Vector3(x_, y_);
         }
 
-        public void SetGemCoords(int x, int y)
+        public void SetPipeCoords(int x, int y)
         {
             x_ = x;
             y_ = y;
