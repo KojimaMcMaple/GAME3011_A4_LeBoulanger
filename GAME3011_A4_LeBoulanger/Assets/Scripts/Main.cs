@@ -123,7 +123,7 @@ public class Main : MonoBehaviour
         return result != null && result.Count > 2;
     }
 
-    public void SwapGridCells(int start_x, int start_y, int dest_x, int dest_y)
+    public void SwapGridCellPipes(int start_x, int start_y, int dest_x, int dest_y)
     {
         if (!IsValidCoords(start_x, start_y) || !IsValidCoords(dest_x, dest_y)) 
         {
@@ -145,7 +145,7 @@ public class Main : MonoBehaviour
         dest_cell.SetCellItem(start_gem);
     }
 
-    public bool TrySwapGridCells(int start_x, int start_y, int dest_x, int dest_y)
+    public bool TrySwapGridCellPipes(int start_x, int start_y, int dest_x, int dest_y)
     {
         if (!IsValidCoords(start_x, start_y) || !IsValidCoords(dest_x, dest_y))
         {
@@ -164,14 +164,42 @@ public class Main : MonoBehaviour
             return false;
         }
 
-        SwapGridCells(start_x, start_y, dest_x, dest_y);
+        SwapGridCellPipes(start_x, start_y, dest_x, dest_y);
         bool has_match = HasMatch(start_x, start_y) || HasMatch(dest_x, dest_y);
         if (!has_match)
         {
-            SwapGridCells(start_x, start_y, dest_x, dest_y);
+            SwapGridCellPipes(start_x, start_y, dest_x, dest_y);
         }
 
         return has_match;
+    }
+
+    public void RotGridCellPipe(int coord_x, int coord_y)
+    {
+        if (!IsValidCoords(coord_x, coord_y))
+        {
+            return;
+        }
+
+        GridCell cell = grid_.GetValue(coord_x, coord_y);
+        Pipe pipe = cell.GetCellItem();
+        pipe.DoIncrementRot();
+    }
+
+    public bool TryRotGridCellPipe(int coord_x, int coord_y)
+    {
+        if (!IsValidCoords(coord_x, coord_y))
+        {
+            return false;
+        }
+        if (GetPipeSOAtCoords(coord_x, coord_y).is_immovable)
+        {
+            return false;
+        }
+
+        RotGridCellPipe(coord_x, coord_y);
+
+        return true;
     }
 
     public bool TryProcessMatchesAtCoords(int start_x, int start_y, int dest_x, int dest_y)
@@ -547,6 +575,14 @@ public class Main : MonoBehaviour
         public void SetRotType(GlobalEnums.RotType value)
         {
             rot_type_ = value;
+        }
+
+        public void DoIncrementRot()
+        {
+            int curr_rot = (int)rot_type_;
+            curr_rot++;
+            curr_rot = curr_rot < (int)GlobalEnums.RotType.NUM_OF_TYPES ? curr_rot : 0;
+            SetRotType((GlobalEnums.RotType)curr_rot);
         }
 
         public int GetBitmask()

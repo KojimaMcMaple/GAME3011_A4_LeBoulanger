@@ -85,7 +85,13 @@ public class View : MonoBehaviour
                     start_drag_x_ = coords.x;
                     start_drag_y_ = coords.y;
 
-                    vfx_manager_.GetVfx(new Vector3(start_drag_x_, start_drag_y_), GlobalEnums.VfxType.HIT);
+                    vfx_manager_.GetVfx(new Vector3(world_pos.x, world_pos.y), GlobalEnums.VfxType.HIT);
+
+                    if (model_.TryRotGridCellPipe(start_drag_x_, start_drag_y_))
+                    {
+                        
+                        SetBusyState(0.5f, () => state_ = State.kProcessing);
+                    }
                 }
 
                 if (Input.GetMouseButtonUp(0))
@@ -95,35 +101,35 @@ public class View : MonoBehaviour
                     dest_drag_x_ = coords.x;
                     dest_drag_y_ = coords.y;
 
-                    if (dest_drag_x_ != start_drag_x_)
-                    {
-                        dest_drag_y_ = start_drag_y_;
-                        if (dest_drag_x_ < start_drag_x_)
-                        {
-                            dest_drag_x_ = start_drag_x_ - 1;
-                        }
-                        else
-                        {
-                            dest_drag_x_ = start_drag_x_ + 1;
-                        }
-                    }
-                    else
-                    {
-                        dest_drag_x_ = start_drag_x_;
-                        if (dest_drag_y_ < start_drag_y_)
-                        {
-                            dest_drag_y_ = start_drag_y_ - 1;
-                        }
-                        else
-                        {
-                            dest_drag_y_ = start_drag_y_ + 1;
-                        }
-                    }
+                    //if (dest_drag_x_ != start_drag_x_)
+                    //{
+                    //    dest_drag_y_ = start_drag_y_;
+                    //    if (dest_drag_x_ < start_drag_x_)
+                    //    {
+                    //        dest_drag_x_ = start_drag_x_ - 1;
+                    //    }
+                    //    else
+                    //    {
+                    //        dest_drag_x_ = start_drag_x_ + 1;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    dest_drag_x_ = start_drag_x_;
+                    //    if (dest_drag_y_ < start_drag_y_)
+                    //    {
+                    //        dest_drag_y_ = start_drag_y_ - 1;
+                    //    }
+                    //    else
+                    //    {
+                    //        dest_drag_y_ = start_drag_y_ + 1;
+                    //    }
+                    //}
 
-                    if (model_.TrySwapGridCells(start_drag_x_, start_drag_y_, dest_drag_x_, dest_drag_y_))
-                    {
-                        SetBusyState(0.5f, () => state_ = State.kProcessing);
-                    }
+                    //if (model_.TrySwapGridCellPipes(start_drag_x_, start_drag_y_, dest_drag_x_, dest_drag_y_))
+                    //{
+                    //    SetBusyState(0.5f, () => state_ = State.kProcessing);
+                    //}
                 }
                 break;
             case State.kProcessing:
@@ -223,7 +229,7 @@ public class View : MonoBehaviour
 
     public void SwapGridCells(int start_x, int start_y, int dest_x, int dest_y)
     {
-        model_.SwapGridCells(start_x, start_y, dest_x, dest_y);
+        model_.SwapGridCellPipes(start_x, start_y, dest_x, dest_y);
 
         SetBusyState(0.5f, () => state_ = State.kProcessing);
     }
@@ -342,7 +348,9 @@ public class View : MonoBehaviour
             Vector3 dir = target - transform_.position;
             float speed = 4.5f;
             transform_.position += dir * speed * Time.deltaTime;
-            sprite_transform_.localRotation = Quaternion.Lerp(sprite_transform_.localRotation, Quaternion.Euler(target_euler_), 2*Time.deltaTime);
+            UpdateTransformRotation();
+            float rot_speed = 2.5f;
+            sprite_transform_.localRotation = Quaternion.Lerp(sprite_transform_.localRotation, Quaternion.Euler(target_euler_), rot_speed * Time.deltaTime);
         }
 
         public void UpdateTransformRotation()
