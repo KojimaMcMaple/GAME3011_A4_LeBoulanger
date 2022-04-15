@@ -489,17 +489,23 @@ public class Main : MonoBehaviour
     {
         public event EventHandler OnDestroyed;
 
-        private PipeSO pipe_;
+        private PipeSO pipe_; //contains LineTileType 
         private int x_;
         private int y_;
         private bool is_dead_;
 
-        public Pipe(PipeSO pipe, int x, int y)
+        private GlobalEnums.RotType rot_type_;
+        private int bitmask_;
+
+        public Pipe(PipeSO pipe, int x, int y, GlobalEnums.RotType rot_type)
         {
             pipe_ = pipe;
             x_ = x;
             y_ = y;
             is_dead_ = false;
+
+            rot_type_ = rot_type;
+            UpdateBitmask();
         }
 
         public PipeSO GetPipeSO()
@@ -527,6 +533,50 @@ public class Main : MonoBehaviour
         public override string ToString()
         {
             return is_dead_.ToString();
+        }
+
+        public int GetBitmask()
+        {
+            return bitmask_;
+        }
+
+        public void SetBitmask(int mask)
+        {
+            bitmask_ = mask;
+        }
+
+        private void UpdateBitmask()
+        {
+            switch (pipe_.line_type)
+            {
+                case GlobalEnums.LineTileType.Nub:
+                    if (rot_type_ == GlobalEnums.RotType.Rot0) bitmask_ = GlobalEnums.kBitmaskTop;
+                    if (rot_type_ == GlobalEnums.RotType.Rot90) bitmask_ = GlobalEnums.kBitmaskRight;
+                    if (rot_type_ == GlobalEnums.RotType.Rot180) bitmask_ = GlobalEnums.kBitmaskBottom;
+                    if (rot_type_ == GlobalEnums.RotType.Rot270) bitmask_ = GlobalEnums.kBitmaskLeft;
+                    break;
+                case GlobalEnums.LineTileType.Line:
+                    if (rot_type_ == GlobalEnums.RotType.Rot0 || rot_type_ == GlobalEnums.RotType.Rot180) bitmask_ = GlobalEnums.kBitmaskTop | GlobalEnums.kBitmaskBottom;
+                    if (rot_type_ == GlobalEnums.RotType.Rot90 || rot_type_ == GlobalEnums.RotType.Rot270) bitmask_ = GlobalEnums.kBitmaskRight | GlobalEnums.kBitmaskLeft;
+                    break;
+                case GlobalEnums.LineTileType.Corner:
+                    if (rot_type_ == GlobalEnums.RotType.Rot0) bitmask_ = GlobalEnums.kBitmaskTop | GlobalEnums.kBitmaskRight;
+                    if (rot_type_ == GlobalEnums.RotType.Rot90) bitmask_ = GlobalEnums.kBitmaskRight | GlobalEnums.kBitmaskBottom;
+                    if (rot_type_ == GlobalEnums.RotType.Rot180) bitmask_ = GlobalEnums.kBitmaskBottom | GlobalEnums.kBitmaskLeft;
+                    if (rot_type_ == GlobalEnums.RotType.Rot270) bitmask_ = GlobalEnums.kBitmaskLeft | GlobalEnums.kBitmaskTop;
+                    break;
+                case GlobalEnums.LineTileType.Threeway:
+                    if (rot_type_ == GlobalEnums.RotType.Rot0) bitmask_ = GlobalEnums.kBitmaskTop | GlobalEnums.kBitmaskRight | GlobalEnums.kBitmaskBottom;
+                    if (rot_type_ == GlobalEnums.RotType.Rot90) bitmask_ = GlobalEnums.kBitmaskRight | GlobalEnums.kBitmaskBottom | GlobalEnums.kBitmaskLeft;
+                    if (rot_type_ == GlobalEnums.RotType.Rot180) bitmask_ = GlobalEnums.kBitmaskBottom | GlobalEnums.kBitmaskLeft | GlobalEnums.kBitmaskTop;
+                    if (rot_type_ == GlobalEnums.RotType.Rot270) bitmask_ = GlobalEnums.kBitmaskLeft | GlobalEnums.kBitmaskTop | GlobalEnums.kBitmaskRight;
+                    break;
+                case GlobalEnums.LineTileType.Cross:
+                    bitmask_ = GlobalEnums.kBitmaskTop | GlobalEnums.kBitmaskRight | GlobalEnums.kBitmaskBottom | GlobalEnums.kBitmaskLeft;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

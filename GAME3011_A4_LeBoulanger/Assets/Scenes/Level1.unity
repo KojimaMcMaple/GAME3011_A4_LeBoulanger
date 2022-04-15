@@ -1387,7 +1387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7959d74d285f55c42b73d289ef57f234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gem_visual_template_: {fileID: 5063645444767931003, guid: 2345c2d26b76ef2449c503b48ab75cb8, type: 3}
+  pipe_visual_template_: {fileID: 0}
   cell_visual_template_: {fileID: 1644153913859304229, guid: c0f01f39a7d0b4b42a8f6f6d624db573, type: 3}
   start_pos_y_: 14
   level_txt_: {fileID: 937215065}
@@ -1407,11 +1407,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b061138992580246ab37efc0c476a60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gem_so_list_:
-  - {fileID: 11400000, guid: 8ea83b11e0aca7842a7773f472d26a52, type: 2}
-  - {fileID: 11400000, guid: 6ed80f8c1aba38046a3a653f90ed0641, type: 2}
-  - {fileID: 11400000, guid: 5d56e40311bc3ef4b8d8db79a0061f83, type: 2}
-  - {fileID: 11400000, guid: 5c6c98e31d4592345890b8ae29d9d47d, type: 2}
+  pipe_so_list_:
+  - {fileID: 11400000, guid: 6e86c29a4ad6be24cb54076307f101e6, type: 2}
+  - {fileID: 11400000, guid: a66843417d46d9b46bccda94c6c75df7, type: 2}
+  - {fileID: 11400000, guid: 80bb89c5c0f2bcd4d967d3e7abbd01ee, type: 2}
+  - {fileID: 11400000, guid: 7ed7ca64170f19f42882eb4725cb8674, type: 2}
   can_spawn_bomb_: 0
 --- !u!82 &1097157808
 AudioSource:

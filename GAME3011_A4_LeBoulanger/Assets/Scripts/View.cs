@@ -14,7 +14,7 @@ public class View : MonoBehaviour
 
     private Main model_;
     private Grid<Main.GridCell> grid_;
-    private Dictionary<Main.Pipe, GemVisual> gem_dict_; //linker between model and view
+    private Dictionary<Main.Pipe, PipeVisual> pipe_dict_; //linker between model and view
     private State state_;
     private float busy_timer_;
 
@@ -159,12 +159,12 @@ public class View : MonoBehaviour
         cam_.position = new Vector3(grid_.GetWidth() *.5f, grid_.GetHeight() * .5f + cam_offset_y, cam_.position.z);
 
         model_.OnGridCellDestroyed += HandleGridCellDestroyedEvent;
-        model_.OnNewPipeSpawned += HandleNewGemSpawnedEvent;
+        model_.OnNewPipeSpawned += HandleNewPipeSpawnedEvent;
         model_.OnBombSpawned += HandleBombSpawnedEvent;
         model_.OnWin += HandleWinEvent;
         model_.OnLoss += HandleLossEvent;
 
-        gem_dict_ = new Dictionary<Main.Pipe, GemVisual>();
+        pipe_dict_ = new Dictionary<Main.Pipe, PipeVisual>();
         for (int x = 0; x < grid_.GetWidth(); x++)
         {
             for (int y = 0; y < grid_.GetHeight(); y++)
@@ -172,7 +172,7 @@ public class View : MonoBehaviour
                 Main.GridCell cell = grid_.GetValue(x, y);
                 Main.Pipe gem = cell.GetCellItem();
 
-                CreateGemVisualAtWorldPos(grid_.GetWorldPos(x, y), gem);
+                CreatePipeVisualAtWorldPos(grid_.GetWorldPos(x, y), gem);
 
                 Instantiate(cell_visual_template_, grid_.GetWorldPos(x, y), Quaternion.identity);
             }
@@ -186,31 +186,31 @@ public class View : MonoBehaviour
     /// <param name="pos"></param>
     /// <param name="pipe"></param>
     /// <returns></returns>
-    private Transform CreateGemVisualAtWorldPos(Vector3 pos, Main.Pipe pipe)
+    private Transform CreatePipeVisualAtWorldPos(Vector3 pos, Main.Pipe pipe)
     {
         Vector3 position = pos;
         position = new Vector3(position.x, start_pos_y_); //move gem way up at the start
 
-        Transform scene_gem = Instantiate(pipe_visual_template_, position, Quaternion.identity);
-        scene_gem.Find("Sprite").GetComponent<SpriteRenderer>().sprite = pipe.GetPipeSO().prefab.GetComponent<SpriteRenderer>().sprite;
-        scene_gem.Find("Sprite").GetComponent<SpriteRenderer>().material = pipe.GetPipeSO().prefab.GetComponent<SpriteRenderer>().sharedMaterial;
+        Transform scene_pipe = Instantiate(pipe_visual_template_, position, Quaternion.identity);
+        scene_pipe.Find("Sprite").GetComponent<SpriteRenderer>().sprite = pipe.GetPipeSO().prefab.GetComponent<SpriteRenderer>().sprite;
+        scene_pipe.Find("Sprite").GetComponent<SpriteRenderer>().material = pipe.GetPipeSO().prefab.GetComponent<SpriteRenderer>().sharedMaterial;
         if (pipe.GetPipeSO().prefab.GetComponent<Animator>().runtimeAnimatorController != null)
         {
-            scene_gem.Find("Sprite").GetComponent<Animator>().runtimeAnimatorController = pipe.GetPipeSO().prefab.GetComponent<Animator>().runtimeAnimatorController;
+            scene_pipe.Find("Sprite").GetComponent<Animator>().runtimeAnimatorController = pipe.GetPipeSO().prefab.GetComponent<Animator>().runtimeAnimatorController;
         }
         
-        GemVisual gem_visual = new GemVisual(scene_gem, pipe);
+        PipeVisual gem_visual = new PipeVisual(scene_pipe, pipe);
 
-        gem_dict_[pipe] = gem_visual;
+        pipe_dict_[pipe] = gem_visual;
 
-        return scene_gem;
+        return scene_pipe;
     }
 
     private void DoUpdateView()
     {
-        foreach (Main.Pipe gem in gem_dict_.Keys)
+        foreach (Main.Pipe gem in pipe_dict_.Keys)
         {
-            gem_dict_[gem].DoUpdate();
+            pipe_dict_[gem].DoUpdate();
         }
     }
 
@@ -269,13 +269,13 @@ public class View : MonoBehaviour
         Main.GridCell cell = sender as Main.GridCell;
         if (cell != null && cell.GetCellItem() != null)
         {
-            gem_dict_.Remove(cell.GetCellItem());
+            pipe_dict_.Remove(cell.GetCellItem());
         }
     }
 
-    private void HandleNewGemSpawnedEvent(object sender, Main.OnNewPipeSpawnedEventArgs e)
+    private void HandleNewPipeSpawnedEvent(object sender, Main.OnNewPipeSpawnedEventArgs e)
     {
-        CreateGemVisualAtWorldPos(e.cell.GetWorldPos(), e.gem);
+        CreatePipeVisualAtWorldPos(e.cell.GetWorldPos(), e.gem);
     }
 
     private void HandleBombSpawnedEvent(object sender, Main.OnBombSpawnedEventArgs e)
@@ -309,20 +309,20 @@ public class View : MonoBehaviour
 
 
 
-    public class GemVisual
+    public class PipeVisual
     {
         private Transform transform_;
-        private Main.Pipe gem_;
+        private Main.Pipe pipe_;
         private bool is_destroyed;
         private VfxManager vfx_manager_; //[TODO] can be made into event
 
-        public GemVisual(Transform t, Main.Pipe gem)
+        public PipeVisual(Transform t, Main.Pipe pipe)
         {
             transform_ = t;
-            gem_ = gem;
+            pipe_ = pipe;
             is_destroyed = false;
 
-            gem_.OnDestroyed += HandleGemDestroyedEvent;
+            pipe_.OnDestroyed += HandlePipeDestroyedEvent;
 
             vfx_manager_ = FindObjectOfType<VfxManager>();
         }
@@ -333,13 +333,13 @@ public class View : MonoBehaviour
             {
                 return;
             }
-            Vector3 target = gem_.GetWorldPos();
+            Vector3 target = pipe_.GetWorldPos();
             Vector3 dir = target - transform_.position;
             float speed = 4.5f;
             transform_.position += dir * speed * Time.deltaTime;
         }
 
-        private void HandleGemDestroyedEvent(object sender, System.EventArgs e)
+        private void HandlePipeDestroyedEvent(object sender, System.EventArgs e)
         {
             is_destroyed = true;
             vfx_manager_.GetVfx(transform_.position, GlobalEnums.VfxType.GEM_CLEAR);
