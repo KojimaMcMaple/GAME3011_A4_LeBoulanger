@@ -369,15 +369,15 @@ public class View : MonoBehaviour
                     break;
                 case GlobalEnums.RotType.Rot90:
                     //transform_.rotation = Quaternion.Euler(0, 0, 90);
-                    target_euler_ = new Vector3(0, 0, 90);
+                    target_euler_ = new Vector3(0, 0, -90);
                     break;
                 case GlobalEnums.RotType.Rot180:
                     //transform_.rotation = Quaternion.Euler(0, 0, 180);
-                    target_euler_ = new Vector3(0, 0, 180);
+                    target_euler_ = new Vector3(0, 0, -180);
                     break;
                 case GlobalEnums.RotType.Rot270:
                     //transform_.rotation = Quaternion.Euler(0, 0, 270);
-                    target_euler_ = new Vector3(0, 0, 270);
+                    target_euler_ = new Vector3(0, 0, -270);
                     break;
                 default:
                     break;
