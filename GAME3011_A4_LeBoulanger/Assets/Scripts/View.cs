@@ -164,6 +164,7 @@ public class View : MonoBehaviour
         float cam_offset_y = 0.1f;
         cam_.position = new Vector3(grid_.GetWidth() *.5f, grid_.GetHeight() * .5f + cam_offset_y, cam_.position.z);
 
+        model_.OnGridCellMatched += HandleGridCellMatchedEvent;
         model_.OnGridCellDestroyed += HandleGridCellDestroyedEvent;
         model_.OnNewPipeSpawned += HandleNewPipeSpawnedEvent;
         model_.OnBombSpawned += HandleBombSpawnedEvent;
@@ -175,7 +176,7 @@ public class View : MonoBehaviour
         {
             for (int y = 0; y < grid_.GetHeight(); y++)
             {
-                Main.GridCell cell = grid_.GetValue(x, y);
+                Main.GridCell cell = grid_.GetGridObj(x, y);
                 Main.Pipe pipe = cell.GetCellItem();
 
                 CreatePipeVisualAtWorldPos(grid_.GetWorldPos(x, y), pipe);
@@ -268,6 +269,11 @@ public class View : MonoBehaviour
     public void DoQuit()
     {
         Application.Quit();
+    }
+
+    private void HandleGridCellMatchedEvent(object sender, Main.OnGridCellChangedEventArgs e)
+    {
+        pipe_dict_[e.pipe].SetSpriteTint(Color.red);
     }
 
     private void HandleGridCellDestroyedEvent(object sender, System.EventArgs e)
@@ -376,6 +382,11 @@ public class View : MonoBehaviour
                 default:
                     break;
             }
+        }
+
+        public void SetSpriteTint(Color value)
+        {
+            transform_.Find("Sprite").GetComponent<SpriteRenderer>().color = value;
         }
 
         private void HandlePipeDestroyedEvent(object sender, System.EventArgs e)

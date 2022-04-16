@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
+    public event EventHandler<OnGridCellChangedEventArgs> OnGridCellMatched; //event to send command from model to view
     public event EventHandler OnGridCellDestroyed; //event to send command from model to view
     public event EventHandler<OnNewPipeSpawnedEventArgs> OnNewPipeSpawned; //event to send command from model to view
     public event EventHandler<OnBombSpawnedEventArgs> OnBombSpawned; //event to send command from model to view
@@ -13,6 +14,13 @@ public class Main : MonoBehaviour
     public event EventHandler OnTimerChanged;
     public event EventHandler OnWin;
     public event EventHandler OnLoss;
+
+    public class OnGridCellChangedEventArgs : EventArgs
+    {
+        public Pipe pipe;
+        public int x;
+        public int y;
+    }
 
     public class OnNewPipeSpawnedEventArgs : EventArgs
     {
@@ -40,8 +48,8 @@ public class Main : MonoBehaviour
 
     private void Awake()
     {
-        width_ = 10;
-        height_ = 10;
+        width_ = 3; //10
+        height_ = 3; //10
         grid_ = new Grid<GridCell>(width_, height_, 1f, Vector3.zero, 
             (Grid<GridCell> grid_, int x, int y) => new GridCell(grid_,x,y));
 
@@ -64,10 +72,35 @@ public class Main : MonoBehaviour
                 }
                 PipeSO pipe_so = pipe_so_list_[idx];
                 Pipe pipe = new Pipe(pipe_so, x, y, (GlobalEnums.RotType)UnityEngine.Random.Range((int)GlobalEnums.RotType.Rot0, (int)GlobalEnums.RotType.NUM_OF_TYPES)); //rand rot);
-                grid_.GetValue(x,y).SetCellItem(pipe);
+                grid_.GetGridObj(x,y).SetCellItem(pipe);
             }
         }
         score_ = 0;
+    }
+
+    private void Start()
+    {
+        Vector2Int start_coords = new Vector2Int(0, UnityEngine.Random.Range(0, height_));
+        Vector2Int end_coords = new Vector2Int();
+        PathGenerator.GeneratePath(start_coords, width_, height_, UnityEngine.Random.Range(height_, width_ * height_), out end_coords);
+        Debug.Log("> start_coords: " + start_coords.x + ", " + start_coords.y);
+        Debug.Log("> end_coords: " + end_coords.x + ", " + end_coords.y);
+        GridCell start_cell = grid_.GetGridObj(start_coords.x, start_coords.y);
+        start_cell.GetCellItem().SetIsStartPoint(true);
+        OnGridCellMatched?.Invoke(this, new OnGridCellChangedEventArgs
+        {
+            pipe = start_cell.GetCellItem(),
+            x = start_cell.GetX(),
+            y = start_cell.GetY()
+        });
+        GridCell end_cell = grid_.GetGridObj(end_coords.x, end_coords.y);
+        end_cell.GetCellItem().SetIsEndPoint(true);
+        OnGridCellMatched?.Invoke(this, new OnGridCellChangedEventArgs
+        {
+            pipe = end_cell.GetCellItem(),
+            x = end_cell.GetX(),
+            y = end_cell.GetY()
+        });
     }
 
     private void FixedUpdate()
@@ -113,8 +146,140 @@ public class Main : MonoBehaviour
         {
             return null;
         }
-        GridCell cell = grid_.GetValue(x, y);
+        GridCell cell = grid_.GetGridObj(x, y);
         return cell.GetCellItem().GetPipeSO();
+    }
+
+    public List<GridCell> GetSurroundGridObj(int x, int y)
+    {
+        if (!IsValidCoords(x, y))
+        {
+            return null;
+        }
+
+        List<GridCell> result = new List<GridCell>();
+        if (x > 0) { result.Add(grid_.GetGridObj(x - 1, y)); }
+        if (x < width_-1) { result.Add(grid_.GetGridObj(x + 1, y)); }
+        if (y > 0) { result.Add(grid_.GetGridObj(x, y - 1)); }
+        if (y < height_ - 1) { result.Add(grid_.GetGridObj(x, y + 1)); }
+
+        return result;
+    }
+
+    private GlobalEnums.PipeMatchType GetMatchTypeBetweenPipes(int start_x, int start_y, int dest_x, int dest_y)
+    {
+        GridCell start_cell = grid_.GetGridObj(start_x, start_y);
+        GridCell dest_cell = grid_.GetGridObj(dest_x, dest_y);
+        Pipe start_pipe = start_cell.GetCellItem();
+        Pipe dest_pipe = dest_cell.GetCellItem();
+
+        int start_bitmask = start_pipe.GetBitmask();
+        int dest_bitmask = dest_pipe.GetBitmask();
+
+        if (dest_y < start_y)
+        {
+            start_bitmask &= GlobalEnums.kBitmaskBottom;
+            dest_bitmask &= GlobalEnums.kBitmaskTop;
+        }
+        else if (dest_y > start_y)
+        {
+            start_bitmask &= GlobalEnums.kBitmaskTop;
+            dest_bitmask &= GlobalEnums.kBitmaskBottom;
+        }
+        else if (dest_x < start_x)
+        {
+            start_bitmask &= GlobalEnums.kBitmaskLeft;
+            dest_bitmask &= GlobalEnums.kBitmaskRight;
+        }
+        else if (dest_x > start_x)
+        {
+            start_bitmask &= GlobalEnums.kBitmaskRight;
+            dest_bitmask &= GlobalEnums.kBitmaskLeft;
+        }
+
+        if (start_bitmask == 0)
+        {
+            return GlobalEnums.PipeMatchType.ValidWithOpenSide;
+        }
+        else if (dest_bitmask != 0)
+        {
+            return GlobalEnums.PipeMatchType.ValidWithSolidMatch;
+        }
+        return GlobalEnums.PipeMatchType.Invalid;
+    }
+
+    private List<GridCell> GetAllMatches()
+    {
+        List<GridCell> result = new List<GridCell>();
+
+        GridCell curr_cell = grid_.GetGridObj(0, 0);
+        List<GridCell> surround_cells = new List<GridCell>();
+        List<GridCell> checked_cells = new List<GridCell>();
+
+        while (curr_cell != null)
+        {
+            Debug.Log("> Curr: " + curr_cell.GetX() + ", " + curr_cell.GetY());
+            List<GridCell> curr_matches = new List<GridCell>();
+            curr_matches.Add(curr_cell);
+            bool is_processing_match_group = true;
+            while (is_processing_match_group)
+            {
+                Debug.Log("> Process: " + curr_cell.GetX() + ", " + curr_cell.GetY());
+                
+                // CHECK MATCH WITH SURROUND CELLS
+                surround_cells = GetSurroundGridObj(curr_cell.GetX(), curr_cell.GetY());
+                foreach (GridCell sc in surround_cells)
+                {
+                    GlobalEnums.PipeMatchType match_type = GetMatchTypeBetweenPipes(curr_cell.GetX(), curr_cell.GetY(),
+                                                                                    sc.GetX(), sc.GetY());
+                    if (match_type == GlobalEnums.PipeMatchType.ValidWithSolidMatch)
+                    {
+                        curr_matches.Add(sc);
+                    }
+                }
+                if (!checked_cells.Contains(curr_cell))
+                {
+                    checked_cells.Add(curr_cell);
+                }
+
+                // SET NEXT CURR CELL
+                for (int i = 0; i < curr_matches.Count; i++)
+                {
+                    GridCell cell = curr_matches[i];
+                    if (checked_cells.Contains(cell))
+                    {
+                        if (i == curr_matches.Count-1)
+                        {
+                            is_processing_match_group = false;
+                            result.AddRange(curr_matches);
+                        }
+                    }
+                    else
+                    {
+                        curr_cell = cell;
+                        break;
+                    }
+                }
+            }
+
+            // SET NEXT CURR CELL
+            curr_cell = null;
+            for (int i = 0; i < width_; i++)
+            {
+                for (int j = 0; j < height_; j++)
+                {
+                    GridCell cell = grid_.GetGridObj(i, j);
+                    if (!result.Contains(cell))
+                    {
+                        curr_cell = cell;
+                        break;
+                    }
+                }
+                if (curr_cell!=null) { break; }
+            }
+        }
+
+        return result;
     }
 
     public bool HasMatch(int x, int y)
@@ -134,8 +299,8 @@ public class Main : MonoBehaviour
             return;
         }
 
-        GridCell start_cell = grid_.GetValue(start_x, start_y);
-        GridCell dest_cell = grid_.GetValue(dest_x, dest_y);
+        GridCell start_cell = grid_.GetGridObj(start_x, start_y);
+        GridCell dest_cell = grid_.GetGridObj(dest_x, dest_y);
         Pipe start_gem = start_cell.GetCellItem();
         Pipe dest_gem = dest_cell.GetCellItem();
 
@@ -181,7 +346,7 @@ public class Main : MonoBehaviour
             return;
         }
 
-        GridCell cell = grid_.GetValue(coord_x, coord_y);
+        GridCell cell = grid_.GetGridObj(coord_x, coord_y);
         Pipe pipe = cell.GetCellItem();
         pipe.DoIncrementRot();
     }
@@ -198,6 +363,20 @@ public class Main : MonoBehaviour
         }
 
         RotGridCellPipe(coord_x, coord_y);
+
+
+
+        List<GridCell> matches = GetAllMatches();
+        foreach (GridCell cell in matches)
+        {
+            OnGridCellMatched?.Invoke(this, new OnGridCellChangedEventArgs
+            {
+                pipe = cell.GetCellItem(),
+                x = cell.GetX(),
+                y = cell.GetY()
+            });
+        }
+
 
         return true;
     }
@@ -263,7 +442,7 @@ public class Main : MonoBehaviour
                 {
                     for (int j = -1; j < 2; j++)
                     {
-                        bombed_cells.Add(grid_.GetValue(x+i, y+j));
+                        bombed_cells.Add(grid_.GetGridObj(x+i, y+j));
                     }
                 }
                 foreach (GridCell cell in bombed_cells)
@@ -273,7 +452,7 @@ public class Main : MonoBehaviour
                 OnBombSpawned?.Invoke(this, new OnBombSpawnedEventArgs
                 {
                     x = x,
-                    y = y,
+                    y = y
                 });
             }
         }
@@ -301,12 +480,12 @@ public class Main : MonoBehaviour
         {
             for (int y = 0; y < height_; y++)
             {
-                GridCell cell = grid_.GetValue(x, y);
+                GridCell cell = grid_.GetGridObj(x, y);
                 if (cell.HasCellItem())
                 {
                     for (int i = y-1; i >=0; i--)
                     {
-                        GridCell cell_below = grid_.GetValue(x, i);
+                        GridCell cell_below = grid_.GetGridObj(x, i);
                         if (!cell_below.HasCellItem()) //move cell down
                         {
                             cell.GetCellItem().SetPipeCoords(x, i);
@@ -330,7 +509,7 @@ public class Main : MonoBehaviour
         {
             for (int y = 0; y < height_; y++)
             {
-                GridCell cell = grid_.GetValue(x, y);
+                GridCell cell = grid_.GetGridObj(x, y);
                 if (!cell.HasCellItem())
                 {
                     PipeSO pipe_so = pipe_so_list_[UnityEngine.Random.Range(0, pipe_so_list_.Count-1)]; //no immoveable when spawning new
@@ -434,7 +613,7 @@ public class Main : MonoBehaviour
             {
                 if (bound_left + i != x)
                 {
-                    result.Add(grid_.GetValue(bound_left + i, y));
+                    result.Add(grid_.GetGridObj(bound_left + i, y));
                 }
             }
         }
@@ -445,13 +624,13 @@ public class Main : MonoBehaviour
             {
                 if (bound_down + i != y)
                 {
-                    result.Add(grid_.GetValue(x, bound_down + i));
+                    result.Add(grid_.GetGridObj(x, bound_down + i));
                 }
             }
         }
         if (result.Count != 0)
         {
-            result.Add(grid_.GetValue(x, y));
+            result.Add(grid_.GetGridObj(x, y));
         }
         return result;
     }
@@ -525,6 +704,8 @@ public class Main : MonoBehaviour
         private int x_;
         private int y_;
         private bool is_dead_;
+        private bool is_start_point_;
+        private bool is_end_point_;
 
         private GlobalEnums.RotType rot_type_;
         private int bitmask_;
@@ -556,6 +737,26 @@ public class Main : MonoBehaviour
             y_ = y;
         }
 
+        public bool IsStartPoint()
+        {
+            return is_start_point_;
+        }
+
+        public void SetIsStartPoint(bool value)
+        {
+            is_start_point_ = value;
+        }
+
+        public bool IsEndPoint()
+        {
+            return is_end_point_;
+        }
+
+        public void SetIsEndPoint(bool value)
+        {
+            is_end_point_ = value;
+        }
+
         public void Destroy()
         {
             is_dead_ = true;
@@ -575,6 +776,7 @@ public class Main : MonoBehaviour
         public void SetRotType(GlobalEnums.RotType value)
         {
             rot_type_ = value;
+            UpdateBitmask();
         }
 
         public void DoIncrementRot()

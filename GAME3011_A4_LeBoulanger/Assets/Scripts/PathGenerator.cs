@@ -6,31 +6,31 @@ public class PathGenerator : MonoBehaviour
 {
     private void Start()
     {
-        Vector2Int endSpot;
-        List<Vector2Int> a = GeneratePath(Vector2Int.zero ,15,15, 35, out endSpot);
-            if(a.Count >=  9 )
-                print("a was completed");
-            else print("a was only " + a.Count + " spaces");
-        List<Vector2Int> b = GeneratePath(Vector2Int.zero ,15,15, 20, out endSpot);
-        if (b.Count >= 9)
-            print("b was completed");
-        else print("b was only " + b.Count + " spaces");
-        List<Vector2Int> c = GeneratePath(Vector2Int.zero ,15,15, 25, out endSpot);
-        if (c.Count >= 9)
-            print("c was completed");
-        else print("c was only " + c.Count + " spaces");
-        List<Vector2Int> d = GeneratePath(Vector2Int.zero ,15,15, 30, out endSpot);
-        if (d.Count >= 9)
-            print("d was completed");
-        else print("d was only " + d.Count + " spaces");
+        //Vector2Int endSpot;
+        //List<Vector2Int> a = GeneratePath(Vector2Int.zero ,15,15, 35, out endSpot);
+        //    if(a.Count >=  9 )
+        //        print("a was completed");
+        //    else print("a was only " + a.Count + " spaces");
+        //List<Vector2Int> b = GeneratePath(Vector2Int.zero ,15,15, 20, out endSpot);
+        //if (b.Count >= 9)
+        //    print("b was completed");
+        //else print("b was only " + b.Count + " spaces");
+        //List<Vector2Int> c = GeneratePath(Vector2Int.zero ,15,15, 25, out endSpot);
+        //if (c.Count >= 9)
+        //    print("c was completed");
+        //else print("c was only " + c.Count + " spaces");
+        //List<Vector2Int> d = GeneratePath(Vector2Int.zero ,15,15, 30, out endSpot);
+        //if (d.Count >= 9)
+        //    print("d was completed");
+        //else print("d was only " + d.Count + " spaces");
             
-        foreach(Vector2Int i in a)
-                print(i);
+        //foreach(Vector2Int i in a)
+        //        print(i);
     }
 
     //returns a list of directions for the path to go in. can overlap(which should cause a branching pipe)
     //might return early if it failed to find a path
-    public List<Vector2Int> GeneratePath(Vector2Int startPos, int width, int height, int pathLength, out Vector2Int lastAddedNode)
+    public static List<Vector2Int> GeneratePath(Vector2Int startPos, int width, int height, int pathLength, out Vector2Int lastAddedNode)
     {
 
         List<Vector2Int> path = new List<Vector2Int>(pathLength);
@@ -107,7 +107,7 @@ public class PathGenerator : MonoBehaviour
         return dir;
     }
 
-    bool OutOfBoundsCheck(Vector2Int pos, int w, int h)
+    private static bool OutOfBoundsCheck(Vector2Int pos, int w, int h)
     {
        return (pos.x < 0 || pos.y < 0 || pos.x >= w || pos.y >= h);
 

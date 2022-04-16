@@ -99,7 +99,7 @@ public class Grid<T>
         SetValue(coords.x, coords.y, value);
     }
 
-    public T GetValue(int x, int y)
+    public T GetGridObj(int x, int y)
     {
         if (x < 0 || y < 0 || x >= width_ || y >= height_)
         {
@@ -111,10 +111,10 @@ public class Grid<T>
         }
     }
 
-    public T GetValue(Vector3 world_pos)
+    public T GetGridObj(Vector3 world_pos)
     {
         Vector2Int coords = GetGridCoords(world_pos);
-        return GetValue(coords.x, coords.y);
+        return GetGridObj(coords.x, coords.y);
     }
 
     public int GetWidth()

@@ -48,7 +48,7 @@ public static class GlobalEnums
         NUM_OF_TYPES
     };
 
-    public enum TileConnectionType
+    public enum PipeMatchType
     {
         Invalid, //mismatch
         ValidWithOpenSide, // The tiles don't directly connect, but not because of an unmatched edge.
