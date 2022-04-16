@@ -164,7 +164,7 @@ public class View : MonoBehaviour
         float cam_offset_y = 0.1f;
         cam_.position = new Vector3(grid_.GetWidth() *.5f, grid_.GetHeight() * .5f + cam_offset_y, cam_.position.z);
 
-        model_.OnGridCellMatched += HandleGridCellMatchedEvent;
+        model_.OnGridCellChanged += HandleGridCellChangedEvent;
         model_.OnGridCellDestroyed += HandleGridCellDestroyedEvent;
         model_.OnNewPipeSpawned += HandleNewPipeSpawnedEvent;
         model_.OnBombSpawned += HandleBombSpawnedEvent;
@@ -271,9 +271,9 @@ public class View : MonoBehaviour
         Application.Quit();
     }
 
-    private void HandleGridCellMatchedEvent(object sender, Main.OnGridCellChangedEventArgs e)
+    private void HandleGridCellChangedEvent(object sender, Main.OnGridCellChangedEventArgs e)
     {
-        pipe_dict_[e.pipe].SetSpriteTint(Color.red);
+        pipe_dict_[e.pipe].SetSpriteTint(e.color);
     }
 
     private void HandleGridCellDestroyedEvent(object sender, System.EventArgs e)

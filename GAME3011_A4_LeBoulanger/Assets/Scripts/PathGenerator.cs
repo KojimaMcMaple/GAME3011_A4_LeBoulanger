@@ -30,9 +30,8 @@ public class PathGenerator : MonoBehaviour
 
     //returns a list of directions for the path to go in. can overlap(which should cause a branching pipe)
     //might return early if it failed to find a path
-    public static List<Vector2Int> GeneratePath(Vector2Int startPos, int width, int height, int pathLength, out Vector2Int lastAddedNode)
+    public static (List<Vector2Int>, List<Vector2Int>) GeneratePath(Vector2Int startPos, int width, int height, int pathLength, out Vector2Int lastAddedNode)
     {
-
         List<Vector2Int> path = new List<Vector2Int>(pathLength);
         List<Vector2Int> dir = new List<Vector2Int>(pathLength);
 
@@ -41,16 +40,12 @@ public class PathGenerator : MonoBehaviour
 
         lastAddedNode = Vector2Int.zero;
 
-
         //get all path nodes
-
         for (int i = 1; i < pathLength; i++)
         {
             List<Vector2Int> possible = new List<Vector2Int>() { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
             
-
             //step one: removing the directions that it cant go in
-
             if (currentPos.x <= 0 || currentPos + Vector2Int.left == lastAddedNode)
                 possible.Remove(Vector2Int.left);
             if (currentPos.x >= width - 1 || currentPos + Vector2Int.right == lastAddedNode)
@@ -62,7 +57,7 @@ public class PathGenerator : MonoBehaviour
 
             //Step 2 get a random direction from the remaining directions, we'll use to update the grid position
             if (possible.Count <= 0)
-                return dir;
+                return (path, dir);
             int random = Random.Range(0, possible.Count);
             Vector2Int newPos = currentPos + possible[random];
 
@@ -83,7 +78,7 @@ public class PathGenerator : MonoBehaviour
                     }
                     possible.Remove(possible[random]);
                     if (possible.Count <= 0)
-                        return dir;
+                        return (path,dir);
 
                     //pick a new direction and we'll see how things got this time
                     random = Random.Range(0, possible.Count);
@@ -103,16 +98,12 @@ public class PathGenerator : MonoBehaviour
             currentPos = newPos;
             lastAddedNode = path[i-1];
         }
-
-        return dir;
+        //return dir;        
+        return (path, dir);
     }
 
     private static bool OutOfBoundsCheck(Vector2Int pos, int w, int h)
     {
        return (pos.x < 0 || pos.y < 0 || pos.x >= w || pos.y >= h);
-
     }
-
- 
-
 }
