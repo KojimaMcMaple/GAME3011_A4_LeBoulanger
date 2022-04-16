@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 public class PathGenerator : MonoBehaviour
 {
     private void Start()
@@ -106,4 +108,47 @@ public class PathGenerator : MonoBehaviour
     {
        return (pos.x < 0 || pos.y < 0 || pos.x >= w || pos.y >= h);
     }
+    public static List<Main.Pipe> GeneratePipesFromPath(List<Vector2Int> path, Main gameLogic, Vector2Int startPos)
+    {
+        List<Main.Pipe> pipes = new List<Main.Pipe>(path.Count);
+        List<PipeSO> pipetypes = gameLogic.pipe_so_list_;
+
+        Main.Pipe lastPipe;
+
+        lastPipe = new Main.Pipe(startPos.x, startPos.y);
+        pipes.Add(lastPipe);
+        
+        for(int i = 1; i < pipes.Count; i++)
+        {
+            int newX = path[i].x + (int)lastPipe.GetWorldPos().x;
+            int newY = path[i].x + (int)lastPipe.GetWorldPos().y;
+            
+           
+            //check for other pipes with the same coordinates (god i wish these were vector ints)
+            Main.Pipe oldPipe = pipes.Find(pipe => (int)pipe.GetWorldPos().x == newX && (int)pipe.GetWorldPos().y == newY );
+            if(oldPipe != null)
+            {
+                if(path[i] == path[i-1]) //straight line through an already existing pipe
+                    oldPipe.SetPipeSo(pipetypes[3]);
+                else
+                    oldPipe.SetPipeSo(pipetypes[2]); //turns while passing into another pipe
+                lastPipe = oldPipe;
+            }
+            else
+            {
+                Main.Pipe newPipe = new Main.Pipe(newX, newY);
+                if (path[i] == path[i - 1]) //straight line 
+                    newPipe.SetPipeSo(pipetypes[0]);
+                else
+                    newPipe.SetPipeSo(pipetypes[1]); //turning pipe
+
+                pipes.Add(newPipe);
+                lastPipe = newPipe;
+            }
+
+        }
+
+        return pipes;
+    }
 }
+
