@@ -38,7 +38,7 @@ public class Main : MonoBehaviour
     private Grid<GridCell> grid_;
     private int width_;
     private int height_;
-    [SerializeField] private List<PipeSO> pipe_so_list_;
+    public List<PipeSO> pipe_so_list_;
     private List<GridCell> processing_list_;
     private GridCell start_cell_;
     private GridCell end_cell_;
@@ -100,7 +100,6 @@ public class Main : MonoBehaviour
             Debug.Log("> dir[" + count + "]: " + d.x + ", " + d.y);
             count++;
         }
-
         Debug.Log("> start_coords: " + start_coords.x + ", " + start_coords.y);
         Debug.Log("> end_coords: " + end_coords.x + ", " + end_coords.y);
         start_cell_ = grid_.GetGridObj(start_coords.x, start_coords.y);
@@ -698,7 +697,6 @@ public class Main : MonoBehaviour
     }
 
 
-
     public class Pipe //the item on a GridCell
     {
         public event EventHandler OnDestroyed;
@@ -713,6 +711,11 @@ public class Main : MonoBehaviour
         private GlobalEnums.RotType rot_type_;
         private int bitmask_;
 
+        public Pipe(int x, int y)
+        {
+            x_ = x;
+            y_ = y;
+        }
         public Pipe(PipeSO pipe, int x, int y, GlobalEnums.RotType rot_type)
         {
             pipe_ = pipe;
@@ -727,6 +730,10 @@ public class Main : MonoBehaviour
         public PipeSO GetPipeSO()
         {
             return pipe_;
+        }
+        public void SetPipeSo(PipeSO pipeType) 
+        { 
+            pipe_ = pipeType;
         }
 
         public Vector3 GetWorldPos()
