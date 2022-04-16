@@ -114,38 +114,39 @@ public class PathGenerator : MonoBehaviour
         List<PipeSO> pipetypes = gameLogic.pipe_so_list_;
 
         Main.Pipe lastPipe;
+        
+        Grid<Main.GridCell> grid = gameLogic.GetMainGrid();
 
-        lastPipe = new Main.Pipe(startPos.x, startPos.y);
+        lastPipe = grid.GetGridObj(startPos.x, startPos.y)?.GetCellItem();
         pipes.Add(lastPipe);
         
         for(int i = 1; i < pipes.Count; i++)
         {
-            int newX = path[i].x + (int)lastPipe.GetWorldPos().x;
-            int newY = path[i].x + (int)lastPipe.GetWorldPos().y;
+            int newX = path[i].x + lastPipe.Xcoord;
+            int newY = path[i].x + lastPipe.Ycoord;
             
+            Main.Pipe nextPipe = grid.GetGridObj(newX, newY)?.GetCellItem();
            
-            //check for other pipes with the same coordinates (god i wish these were vector ints)
-            Main.Pipe oldPipe = pipes.Find(pipe => (int)pipe.GetWorldPos().x == newX && (int)pipe.GetWorldPos().y == newY );
-            if(oldPipe != null)
+            //check for other pipes with the same coordinates 
+            if(pipes.Contains(nextPipe))
             {
                 if(path[i] == path[i-1]) //straight line through an already existing pipe
-                    oldPipe.SetPipeSo(pipetypes[3]);
+                    nextPipe.SetPipeSo(pipetypes[3]);
                 else
-                    oldPipe.SetPipeSo(pipetypes[2]); //turns while passing into another pipe
-                lastPipe = oldPipe;
+                    nextPipe.SetPipeSo(pipetypes[2]); //turns while passing into another pipe
+                
             }
             else
             {
-                Main.Pipe newPipe = new Main.Pipe(newX, newY);
                 if (path[i] == path[i - 1]) //straight line 
-                    newPipe.SetPipeSo(pipetypes[0]);
+                    nextPipe.SetPipeSo(pipetypes[0]);
                 else
-                    newPipe.SetPipeSo(pipetypes[1]); //turning pipe
+                    nextPipe.SetPipeSo(pipetypes[1]); //turning pipe
 
-                pipes.Add(newPipe);
-                lastPipe = newPipe;
+                pipes.Add(nextPipe);
             }
 
+            lastPipe = nextPipe;
         }
 
         return pipes;

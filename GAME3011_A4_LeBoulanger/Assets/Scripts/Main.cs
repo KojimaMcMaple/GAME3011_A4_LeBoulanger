@@ -39,6 +39,7 @@ public class Main : MonoBehaviour
     private int width_;
     private int height_;
     public List<PipeSO> pipe_so_list_;
+    [SerializeField] PipeSO startPipeSO, endPipeSo; 
     private List<GridCell> processing_list_;
     private GridCell start_cell_;
     private GridCell end_cell_;
@@ -102,8 +103,12 @@ public class Main : MonoBehaviour
         }
         Debug.Log("> start_coords: " + start_coords.x + ", " + start_coords.y);
         Debug.Log("> end_coords: " + end_coords.x + ", " + end_coords.y);
+
+        PathGenerator.GeneratePipesFromPath(path, this, start_coords);
+
         start_cell_ = grid_.GetGridObj(start_coords.x, start_coords.y);
         start_cell_.GetCellItem().SetIsStartPoint(true);
+        start_cell_.GetCellItem().SetPipeSo(startPipeSO);
         OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
         {
             pipe = start_cell_.GetCellItem(),
@@ -113,6 +118,19 @@ public class Main : MonoBehaviour
         });
         end_cell_ = grid_.GetGridObj(end_coords.x, end_coords.y);
         end_cell_.GetCellItem().SetIsEndPoint(true);
+        end_cell_.GetCellItem().SetPipeSo(endPipeSo);
+
+        OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
+        {
+            pipe = end_cell_.GetCellItem(),
+            x = end_cell_.GetX(),
+            y = end_cell_.GetY(),
+            color = Color.green
+        });
+
+
+
+
         OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
         {
             pipe = end_cell_.GetCellItem(),
@@ -648,6 +666,7 @@ public class Main : MonoBehaviour
         private int x_;
         private int y_;
 
+
         public GridCell(Grid<GridCell> grid, int x, int y)
         {
             grid_ = grid;
@@ -712,6 +731,9 @@ public class Main : MonoBehaviour
         private GlobalEnums.RotType rot_type_;
         private int bitmask_;
 
+        public int Ycoord { get => y_; private set => y_ = value; }
+        public int Xcoord { get => x_; private set => x_ = value; }
+
         public Pipe(int x, int y)
         {
             x_ = x;
@@ -740,6 +762,11 @@ public class Main : MonoBehaviour
         public Vector3 GetWorldPos()
         {
             return new Vector3(x_, y_);
+        }
+
+        public Vector2Int GetGridCoord()
+        {
+            return new Vector2Int(x_, y_);
         }
 
         public void SetPipeCoords(int x, int y)
