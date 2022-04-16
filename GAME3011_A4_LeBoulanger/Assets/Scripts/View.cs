@@ -135,15 +135,7 @@ public class View : MonoBehaviour
             case State.kProcessing:
                 if (model_.TryProcessAllMatches())
                 {
-                    SetBusyState(0.33f, () =>
-                    {
-                        model_.DoPipesFall();
-                        SetBusyState(0.33f, () =>
-                        {
-                            model_.DoSpawnNewPipes();
-                            SetBusyState(0.5f, () => state_ = (State.kProcessing));
-                        });
-                    });
+                    TryReturnToAvailableState();
                 }
                 else
                 {
