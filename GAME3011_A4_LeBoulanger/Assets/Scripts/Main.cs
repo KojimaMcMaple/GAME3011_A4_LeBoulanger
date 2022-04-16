@@ -228,112 +228,70 @@ public class Main : MonoBehaviour
         return GlobalEnums.PipeMatchType.Invalid;
     }
 
-    private List<GridCell> GetAllMatches()
+    private bool HasPath(int start_x, int start_y)
     {
-        List<GridCell> result = new List<GridCell>();
-
-        GridCell curr_cell = start_cell_;
+        GridCell curr_cell = grid_.GetGridObj(start_x, start_y);
         List<GridCell> surround_cells = new List<GridCell>();
-        List<GridCell> checked_cells = new List<GridCell>();
+        List<GridCell> matches = new List<GridCell>();
 
-        result.Add(curr_cell);
-        while (curr_cell != null)
+        surround_cells = GetSurroundGridObj(curr_cell.GetX(), curr_cell.GetY());
+        foreach (GridCell sc in surround_cells)
         {
-            // CHECK MATCH WITH SURROUND CELLS
-            surround_cells = GetSurroundGridObj(curr_cell.GetX(), curr_cell.GetY());
-            foreach (GridCell sc in surround_cells)
+            GlobalEnums.PipeMatchType match_type = GetMatchTypeBetweenPipes(curr_cell.GetX(), curr_cell.GetY(),
+                                                                            sc.GetX(), sc.GetY());
+            if (match_type == GlobalEnums.PipeMatchType.ValidWithSolidMatch)
             {
-                GlobalEnums.PipeMatchType match_type = GetMatchTypeBetweenPipes(curr_cell.GetX(), curr_cell.GetY(),
-                                                                                sc.GetX(), sc.GetY());
-                if (match_type == GlobalEnums.PipeMatchType.ValidWithSolidMatch)
+                matches.Add(sc);
+                OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
                 {
-                    result.Add(sc);
-                    OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
-                    {
-                        pipe = sc.GetCellItem(),
-                        x = sc.GetX(),
-                        y = sc.GetY(),
-                        color = Color.red
-                    });
-                }
-                else
+                    pipe = sc.GetCellItem(),
+                    x = sc.GetX(),
+                    y = sc.GetY(),
+                    color = Color.red
+                });
+            }
+            else
+            {
+                OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
                 {
-                    OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
+                    pipe = sc.GetCellItem(),
+                    x = sc.GetX(),
+                    y = sc.GetY(),
+                    color = Color.white
+                });
+            }
+        }
+        if (matches.Contains(end_cell_))
+        {
+            return true;
+        }
+        else
+        {
+            if (matches.Count > 0)
+            {
+                foreach (GridCell mc in matches)
+                {
+                    if (HasPath(mc.GetX(), mc.GetY()))
                     {
-                        pipe = sc.GetCellItem(),
-                        x = sc.GetX(),
-                        y = sc.GetY(),
-                        color = Color.white
-                    });
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
-            curr_cell = null;
-
-
-
-
-            //List<GridCell> curr_matches = new List<GridCell>();
-            //curr_matches.Add(curr_cell);
-            //bool is_processing_match_group = true;
-            //while (is_processing_match_group)
-            //{
-            //    // CHECK MATCH WITH SURROUND CELLS
-            //    surround_cells = GetSurroundGridObj(curr_cell.GetX(), curr_cell.GetY());
-            //    foreach (GridCell sc in surround_cells)
-            //    {
-            //        GlobalEnums.PipeMatchType match_type = GetMatchTypeBetweenPipes(curr_cell.GetX(), curr_cell.GetY(),
-            //                                                                        sc.GetX(), sc.GetY());
-            //        if (match_type == GlobalEnums.PipeMatchType.ValidWithSolidMatch)
-            //        {
-            //            curr_matches.Add(sc);
-            //        }
-            //    }
-            //    if (!checked_cells.Contains(curr_cell))
-            //    {
-            //        checked_cells.Add(curr_cell);
-            //    }
-
-            //    // SET NEXT CURR CELL
-            //    for (int i = 0; i < curr_matches.Count; i++)
-            //    {
-            //        GridCell cell = curr_matches[i];
-            //        if (checked_cells.Contains(cell))
-            //        {
-            //            if (i == curr_matches.Count - 1)
-            //            {
-            //                is_processing_match_group = false;
-            //                result.AddRange(curr_matches);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            curr_cell = cell;
-            //            break;
-            //        }
-            //    }
-            //}
-
-            //// SET NEXT CURR CELL
-            //curr_cell = null;
-            //for (int i = 0; i < width_; i++)
-            //{
-            //    for (int j = 0; j < height_; j++)
-            //    {
-            //        GridCell cell = grid_.GetGridObj(i, j);
-            //        if (!result.Contains(cell))
-            //        {
-            //            curr_cell = cell;
-            //            break;
-            //        }
-            //    }
-            //    if (curr_cell != null) { break; }
-            //}
-
-
-
+            else
+            {
+                return false;
+            }
         }
+        return false;
+    }
 
-        return result;
+    public bool TryProcessAllMatches()
+    {
+        return HasPath(start_cell_.GetX(), start_cell_.GetY());
     }
 
     public bool HasMatch(int x, int y)
@@ -420,7 +378,7 @@ public class Main : MonoBehaviour
 
 
 
-        List<GridCell> matches = GetAllMatches();
+        TryProcessAllMatches();
 
 
         return true;
@@ -447,7 +405,7 @@ public class Main : MonoBehaviour
         return true;
     }
 
-    public bool TryProcessAllMatches()
+    public bool TryProcessAllMatches111()
     {
         return false;
         
