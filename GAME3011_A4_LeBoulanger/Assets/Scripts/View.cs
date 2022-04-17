@@ -211,7 +211,6 @@ public class View : MonoBehaviour
     {
         PipeVisual pv = pipe_dict_[pipe.GetGridCoord()];
         pv.SetSprite(pipe.GetPipeSO().prefab.GetComponent<SpriteRenderer>().sprite);
-        Debug.Log("editing pipe");
     }
 
     private void DoUpdateView()

@@ -102,21 +102,8 @@ public class Main : MonoBehaviour
         List<Vector2Int> path = new List<Vector2Int>();
         List<Vector2Int> dir = new List<Vector2Int>();
         (path, dir) = PathGenerator.GeneratePath(start_coords, width_, height_, UnityEngine.Random.Range(height_, width_ * height_), out end_coords);
-        int count = 0;
-        foreach (var p in path)
-        {
-            Debug.Log("> path[" + count + "]: " + p.x + ", " + p.y);
-            count++;
-        }
-        count = 0;
-        foreach (var d in dir)
-        {
-            Debug.Log("> dir[" + count + "]: " + d.x + ", " + d.y);
-            count++;
-        }
-        Debug.Log("> start_coords: " + start_coords.x + ", " + start_coords.y);
-        Debug.Log("> end_coords: " + end_coords.x + ", " + end_coords.y);
-
+        
+        PathGenerator.GeneratePipesFromPath(dir, this, start_coords);
 
         start_cell_ = grid_.GetGridObj(start_coords.x, start_coords.y);
         start_cell_.GetCellItem().SetIsStartPoint(true);

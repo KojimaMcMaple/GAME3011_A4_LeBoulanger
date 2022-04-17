@@ -124,16 +124,40 @@ public class PathGenerator : MonoBehaviour
         Vector2Int lastPipe = startPos;
         
         Grid<Main.GridCell> grid = gameLogic.GetMainGrid();
+        Main.Pipe startPipe = grid.GetGridObj(startPos.x, startPos.y).GetCellItem();
 
-        
-        
-        for(int i = 0; i < path.Count-1; i++)
+        //grid.GetGridObj(startPos.x, startPos.y).GetCellItem().SetRotType(GlobalEnums.RotType.Rot180);
+        if (path[0] == Vector2Int.up)
+            startPipe.SetRotType(GlobalEnums.RotType.Rot180);
+        else if (path[0] == Vector2Int.right)
+            startPipe.SetRotType(GlobalEnums.RotType.Rot270);
+        else if (path[0] == Vector2Int.down)
+            startPipe.SetRotType(GlobalEnums.RotType.Rot0);
+        else if (path[0] == Vector2Int.left)
+            startPipe.SetRotType(GlobalEnums.RotType.Rot90);
+
+
+        for (int i = 0; i < path.Count; i++)
         {
             int newX = path[i].x + lastPipe.x;
             int newY = path[i].y + lastPipe.y;
             
             Main.Pipe nextPipe = grid.GetGridObj(newX, newY)?.GetCellItem();
-           
+
+
+            if(i == path.Count-1)
+            {
+                if(path[i] == Vector2Int.up)
+                    nextPipe.SetRotType(GlobalEnums.RotType.Rot0);
+                else if(path[i] == Vector2Int.right)
+                    nextPipe.SetRotType(GlobalEnums.RotType.Rot90);
+                else if (path[i] == Vector2Int.down)
+                    nextPipe.SetRotType(GlobalEnums.RotType.Rot180);
+                else if (path[i] == Vector2Int.left)
+                    nextPipe.SetRotType(GlobalEnums.RotType.Rot270);
+                break;
+            }
+
             if(nextPipe == null)
                 continue;
 
@@ -155,7 +179,7 @@ public class PathGenerator : MonoBehaviour
 
                 pipes.Add(nextPipe);
             }
-            Debug.Log("pipe " + nextPipe.GetGridCoord() + " is now a " + nextPipe.GetPipeSO());
+            
             gameLogic.Invoke_ChangedPipeSO(nextPipe);
             lastPipe = nextPipe.GetGridCoord();
         }
