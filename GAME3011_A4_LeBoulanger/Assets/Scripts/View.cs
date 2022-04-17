@@ -27,6 +27,7 @@ public class View : MonoBehaviour
     [SerializeField] private TMP_Text level_txt_;
     [SerializeField] private TMP_Text timer_txt_;
     [SerializeField] private TMP_Text score_txt_;
+    [SerializeField] private TMP_Text player_lv_txt_;
     [SerializeField] private GameObject game_over_panel_;
     [SerializeField] private Text game_over_txt_;
 
@@ -57,7 +58,7 @@ public class View : MonoBehaviour
         state_ = State.kBusy;
         Init(FindObjectOfType<Main>(), FindObjectOfType<Main>().GetMainGrid());
 
-        model_.OnScoreChanged += HandleScoreChangedEvent;
+        player_lv_txt_.text = "Skill Lv: " + model_.GetPlayerLevel() + "\n-Extra time: " + model_.GetExtraTimeFromPlayerLevel(model_.GetLevelTimeLimit());
         model_.OnTimerChanged += HandleTimerChangedEvent;
     }
 
@@ -250,6 +251,7 @@ public class View : MonoBehaviour
 
     private void DoWin()
     {
+        model_.IncrementPlayerLevel(); //try level up when win
         game_over_panel_.SetActive(true);
         game_over_txt_.text = "You Win!";
     }

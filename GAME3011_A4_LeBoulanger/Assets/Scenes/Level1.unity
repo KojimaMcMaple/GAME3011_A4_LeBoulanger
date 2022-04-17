@@ -961,7 +961,7 @@ GameObject:
   - component: {fileID: 603185108}
   - component: {fileID: 603185107}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Panel_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -980,8 +980,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 937215064}
-  - {fileID: 1336558639}
   - {fileID: 1330024427}
+  - {fileID: 1336558639}
   - {fileID: 2141496383}
   m_Father: {fileID: 1598647887}
   m_RootOrder: 0
@@ -1392,7 +1392,8 @@ MonoBehaviour:
   start_pos_y_: 14
   level_txt_: {fileID: 937215065}
   timer_txt_: {fileID: 1336558640}
-  score_txt_: {fileID: 1330024428}
+  score_txt_: {fileID: 0}
+  player_lv_txt_: {fileID: 1330024428}
   game_over_panel_: {fileID: 1523152129}
   game_over_txt_: {fileID: 889634149}
 --- !u!114 &1097157807
@@ -1632,7 +1633,7 @@ GameObject:
   - component: {fileID: 1330024429}
   - component: {fileID: 1330024428}
   m_Layer: 5
-  m_Name: ScoreTxt
+  m_Name: PlayerLvTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1651,7 +1652,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 603185106}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1678,7 +1679,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Score: 3333
+  m_text: 'Skill Lv: 3
 
 '
   m_isRightToLeft: 0
@@ -1788,7 +1789,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 603185106}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2429,7 +2430,7 @@ GameObject:
   - component: {fileID: 2141496385}
   - component: {fileID: 2141496384}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: InstructionTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2475,7 +2476,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: (Get 10000 score to win)
+  m_text: (Find path to Green pipe to win)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2502,8 +2503,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
-  m_fontSizeBase: 32
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

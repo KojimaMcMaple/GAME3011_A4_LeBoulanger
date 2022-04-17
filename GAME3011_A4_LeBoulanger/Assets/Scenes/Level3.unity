@@ -961,7 +961,7 @@ GameObject:
   - component: {fileID: 603185108}
   - component: {fileID: 603185107}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Panel_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -980,8 +980,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 937215064}
-  - {fileID: 1336558639}
   - {fileID: 1330024427}
+  - {fileID: 1336558639}
   - {fileID: 2141496383}
   m_Father: {fileID: 1598647887}
   m_RootOrder: 0
@@ -1246,8 +1246,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1387,12 +1387,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7959d74d285f55c42b73d289ef57f234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pipe_visual_template_: {fileID: 0}
+  pipe_visual_template_: {fileID: 5063645444767931003, guid: bc06c11483d9aca4c962078dad1ce233, type: 3}
   cell_visual_template_: {fileID: 1644153913859304229, guid: c0f01f39a7d0b4b42a8f6f6d624db573, type: 3}
   start_pos_y_: 14
   level_txt_: {fileID: 937215065}
   timer_txt_: {fileID: 1336558640}
-  score_txt_: {fileID: 1330024428}
+  score_txt_: {fileID: 0}
+  player_lv_txt_: {fileID: 1330024428}
   game_over_panel_: {fileID: 1523152129}
   game_over_txt_: {fileID: 889634149}
 --- !u!114 &1097157807
@@ -1407,8 +1408,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b061138992580246ab37efc0c476a60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pipe_so_list_: []
-  can_spawn_bomb_: 1
+  pipe_so_list_:
+  - {fileID: 11400000, guid: 6e86c29a4ad6be24cb54076307f101e6, type: 2}
+  - {fileID: 11400000, guid: a66843417d46d9b46bccda94c6c75df7, type: 2}
+  - {fileID: 11400000, guid: 80bb89c5c0f2bcd4d967d3e7abbd01ee, type: 2}
+  - {fileID: 11400000, guid: 7ed7ca64170f19f42882eb4725cb8674, type: 2}
+  startPipeSO: {fileID: 11400000, guid: 311ea09d0c33a3e49b8552bc941e2541, type: 2}
+  endPipeSo: {fileID: 11400000, guid: 865456079db9db84c83f15c2a7e22a7a, type: 2}
+  can_spawn_bomb_: 0
 --- !u!82 &1097157808
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1626,7 +1633,7 @@ GameObject:
   - component: {fileID: 1330024429}
   - component: {fileID: 1330024428}
   m_Layer: 5
-  m_Name: ScoreTxt
+  m_Name: PlayerLvTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1645,7 +1652,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 603185106}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1672,7 +1679,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Score: 3333
+  m_text: 'Skill Lv: 3
 
 '
   m_isRightToLeft: 0
@@ -1701,8 +1708,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1782,7 +1789,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 603185106}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1836,8 +1843,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2423,7 +2430,7 @@ GameObject:
   - component: {fileID: 2141496385}
   - component: {fileID: 2141496384}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: InstructionTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2469,7 +2476,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: (Get 10000 score to win)
+  m_text: (Find path to Green pipe to win)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2496,8 +2503,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

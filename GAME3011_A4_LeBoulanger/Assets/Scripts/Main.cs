@@ -13,9 +13,9 @@ public class Main : MonoBehaviour
     public event EventHandler<OnBombSpawnedEventArgs> OnBombSpawned; //event to send command from model to view
     public event EventHandler OnScoreChanged;
     public event EventHandler OnTimerChanged;
-    public event EventHandler OnWin;
+    public event EventHandler OnWin; //unused
     public event EventHandler OnLoss;
-    public event EventHandler<Pipe> OnPipeSoChanged;
+    public event EventHandler<Pipe> OnPipeSoChanged; //unused
 
     public class OnGridCellChangedEventArgs : EventArgs
     {
@@ -47,6 +47,7 @@ public class Main : MonoBehaviour
     private GridCell end_cell_;
 
     private int score_;
+    private float level_time_limit_ = 300f;
     private float timer_ = 300f;
     private int player_level_ = 1;
     private int max_immoveables_ = 5;
@@ -60,21 +61,24 @@ public class Main : MonoBehaviour
         {
             width_ = 6;
             height_ = 6;
-            timer_ = 300f;
+            level_time_limit_ = 300f;
+            timer_ = level_time_limit_;
             timer_ += GetExtraTimeFromPlayerLevel(timer_);
         }
         else if (curr_scene.name == "Level2")
         {
             width_ = 8;
             height_ = 8;
-            timer_ = 250f;
+            level_time_limit_ = 250f;
+            timer_ = level_time_limit_;
             timer_ += GetExtraTimeFromPlayerLevel(timer_);
         }
         else
         {
             width_ = 10;
             height_ = 10;
-            timer_ = 200f;
+            level_time_limit_ = 200f;
+            timer_ = level_time_limit_;
             timer_ += GetExtraTimeFromPlayerLevel(timer_);
         }
 
@@ -166,9 +170,19 @@ public class Main : MonoBehaviour
         return score_;
     }
 
+    public float GetLevelTimeLimit()
+    {
+        return level_time_limit_;
+    }
+
     public float GetTimer()
     {
         return timer_;
+    }
+
+    public int GetPlayerLevel()
+    {
+        return player_level_;
     }
 
     public void IncrementPlayerLevel()
@@ -274,7 +288,7 @@ public class Main : MonoBehaviour
     {
         GridCell curr_cell = grid_.GetGridObj(start_x, start_y);
         checked_cells.Add(curr_cell);
-        Debug.Log(">>> curr_cell: (" + curr_cell.GetX() + ", " + curr_cell.GetY() + ")");
+        //Debug.Log(">>> curr_cell: (" + curr_cell.GetX() + ", " + curr_cell.GetY() + ")");
         List<GridCell> matches = new List<GridCell>();
         List<GridCell> surround_cells = new List<GridCell>();
         surround_cells = GetSurroundGridObj(curr_cell.GetX(), curr_cell.GetY());
@@ -288,30 +302,11 @@ public class Main : MonoBehaviour
                 {
                     matches.Add(sc);
                     all_matches.Add(sc);
-
-                    //OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
-                    //{
-                    //    pipe = sc.GetCellItem(),
-                    //    x = sc.GetX(),
-                    //    y = sc.GetY(),
-                    //    color = Color.blue
-                    //});
                 }
-                else
-                {
-                    //OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
-                    //{
-                    //    pipe = sc.GetCellItem(),
-                    //    x = sc.GetX(),
-                    //    y = sc.GetY(),
-                    //    color = Color.white
-                    //});
-                }
-
             }
             else
             {
-                Debug.Log("> sc checked: (" + sc.GetX() + ", " + sc.GetY() + ")");
+                //Debug.Log("> sc checked: (" + sc.GetX() + ", " + sc.GetY() + ")");
             }
         }
         if (matches.Contains(end_cell_))
