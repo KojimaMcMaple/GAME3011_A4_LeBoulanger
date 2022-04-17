@@ -14,7 +14,7 @@ public class View : MonoBehaviour
 
     private Main model_;
     private Grid<Main.GridCell> grid_;
-    private Dictionary<Main.Pipe, PipeVisual> pipe_dict_; //linker between model and view
+    private Dictionary<Vector2Int, PipeVisual> pipe_dict_; //linker between model and view
     private State state_;
     private float busy_timer_;
 
@@ -162,8 +162,9 @@ public class View : MonoBehaviour
         model_.OnBombSpawned += HandleBombSpawnedEvent;
         model_.OnWin += HandleWinEvent;
         model_.OnLoss += HandleLossEvent;
+        model_.OnPipeSoChanged += EditPipeVisual;
 
-        pipe_dict_ = new Dictionary<Main.Pipe, PipeVisual>();
+        pipe_dict_ = new Dictionary<Vector2Int, PipeVisual>();
         for (int x = 0; x < grid_.GetWidth(); x++)
         {
             for (int y = 0; y < grid_.GetHeight(); y++)
@@ -200,14 +201,21 @@ public class View : MonoBehaviour
         
         PipeVisual pipe_visual = new PipeVisual(scene_pipe, pipe);
 
-        pipe_dict_[pipe] = pipe_visual;
+        pipe_dict_[pipe.GetGridCoord()] = pipe_visual;
 
         return scene_pipe;
     }
 
+    private void EditPipeVisual(object sender, Main.Pipe pipe)
+    {
+        PipeVisual pv = pipe_dict_[pipe.GetGridCoord()];
+        pv.SetSprite(pipe.GetPipeSO().prefab.GetComponent<SpriteRenderer>().sprite);
+        Debug.Log("editing pipe");
+    }
+
     private void DoUpdateView()
     {
-        foreach (Main.Pipe gem in pipe_dict_.Keys)
+        foreach (Vector2Int gem in pipe_dict_.Keys)
         {
             pipe_dict_[gem].DoUpdate();
         }
@@ -265,7 +273,8 @@ public class View : MonoBehaviour
 
     private void HandleGridCellChangedEvent(object sender, Main.OnGridCellChangedEventArgs e)
     {
-        pipe_dict_[e.pipe].SetSpriteTint(e.color);
+        if(e.pipe != null && e.color != null)
+            pipe_dict_[e.pipe.GetGridCoord()].SetSpriteTint(e.color);
     }
 
     private void HandleGridCellDestroyedEvent(object sender, System.EventArgs e)
@@ -273,7 +282,7 @@ public class View : MonoBehaviour
         Main.GridCell cell = sender as Main.GridCell;
         if (cell != null && cell.GetCellItem() != null)
         {
-            pipe_dict_.Remove(cell.GetCellItem());
+            pipe_dict_.Remove(cell.GetCellItem().GetGridCoord());
         }
     }
 
@@ -380,6 +389,13 @@ public class View : MonoBehaviour
         {
             transform_.Find("Sprite").GetComponent<SpriteRenderer>().color = value;
         }
+
+        public void SetSprite(Sprite value)
+        {
+            transform_.Find("Sprite").GetComponent<SpriteRenderer>().sprite = value;
+        }
+
+
 
         private void HandlePipeDestroyedEvent(object sender, System.EventArgs e)
         {
