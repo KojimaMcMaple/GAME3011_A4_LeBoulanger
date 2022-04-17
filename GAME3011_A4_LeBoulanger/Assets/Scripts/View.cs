@@ -135,12 +135,12 @@ public class View : MonoBehaviour
             case State.kProcessing:
                 if (model_.TryProcessAllMatches())
                 {
-                    TryReturnToAvailableState();
+                    state_ = State.kGameOver;
+                    DoWin();
                 }
                 else
                 {
-                    //SetBusyState(0.5f, () => state_ = (State.kAvailable));
-                    TryReturnToAvailableState();
+                    state_ = State.kAvailable;
                 }
                 break;
             case State.kGameOver:

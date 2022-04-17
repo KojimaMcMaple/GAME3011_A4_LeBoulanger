@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour
 {
@@ -45,14 +46,36 @@ public class Main : MonoBehaviour
 
     private int score_;
     private float timer_ = 300f;
+    private int player_level_ = 1;
     private int max_immoveables_ = 5;
     private int num_immoveables_ = 0;
     [SerializeField] private bool can_spawn_bomb_ = false;
 
     private void Awake()
     {
-        width_ = 6; //10
-        height_ = 6; //10
+        Scene curr_scene = SceneManager.GetActiveScene();
+        if (curr_scene.name == "Level1")
+        {
+            width_ = 6;
+            height_ = 6;
+            timer_ = 300f;
+            timer_ += GetExtraTimeFromPlayerLevel(timer_);
+        }
+        else if (curr_scene.name == "Level2")
+        {
+            width_ = 8;
+            height_ = 8;
+            timer_ = 250f;
+            timer_ += GetExtraTimeFromPlayerLevel(timer_);
+        }
+        else
+        {
+            width_ = 10;
+            height_ = 10;
+            timer_ = 200f;
+            timer_ += GetExtraTimeFromPlayerLevel(timer_);
+        }
+
         grid_ = new Grid<GridCell>(width_, height_, 1f, Vector3.zero, 
             (Grid<GridCell> grid_, int x, int y) => new GridCell(grid_,x,y));
 
@@ -148,6 +171,28 @@ public class Main : MonoBehaviour
     public float GetTimer()
     {
         return timer_;
+    }
+
+    public void IncrementPlayerLevel()
+    {
+        player_level_ = player_level_ < 3 ? player_level_ + 1 : player_level_;
+    }
+
+    public float GetExtraTimeFromPlayerLevel(float base_time)
+    {
+        if (player_level_ == 1)
+        {
+            return (base_time * 10 / 100);
+        }
+        else if (player_level_ == 2)
+        {
+            return (base_time * 33 / 100);
+        }
+        else if (player_level_ == 3)
+        {
+            return (base_time * 50 / 100);
+        }
+        return 0;
     }
 
     private bool IsValidCoords(int x, int y)
