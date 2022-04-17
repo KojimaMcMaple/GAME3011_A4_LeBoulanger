@@ -55,6 +55,8 @@ public class Main : MonoBehaviour
     private int num_immoveables_ = 0;
     [SerializeField] private bool can_spawn_bomb_ = false;
 
+    [SerializeField] Color ActiveColor, inactiveColor;
+
     private void Awake()
     {
         is_victory = false;
@@ -128,15 +130,15 @@ public class Main : MonoBehaviour
             pipe = start_cell_.GetCellItem(),
             x = start_cell_.GetX(),
             y = start_cell_.GetY(),
-            color = Color.blue
+            color = ActiveColor
         });
         OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
         {
             pipe = end_cell_.GetCellItem(),
             x = end_cell_.GetX(),
             y = end_cell_.GetY(),
-            color = Color.green
-        });
+            color = inactiveColor
+        });;
     }
 
     private void FixedUpdate()
@@ -349,8 +351,8 @@ public class Main : MonoBehaviour
                         pipe = c.GetCellItem(),
                         x = c.GetX(),
                         y = c.GetY(),
-                        color = Color.white
-                    });
+                        color = inactiveColor
+                    });;
                 }
                 
             }
@@ -364,7 +366,7 @@ public class Main : MonoBehaviour
                 pipe = m.GetCellItem(),
                 x = m.GetX(),
                 y = m.GetY(),
-                color = Color.blue
+                color = ActiveColor
             });
         }
 
