@@ -15,6 +15,7 @@ public class Main : MonoBehaviour
     public event EventHandler OnTimerChanged;
     public event EventHandler OnWin;
     public event EventHandler OnLoss;
+    public event EventHandler<Pipe> OnPipeSoChanged;
 
     public class OnGridCellChangedEventArgs : EventArgs
     {
@@ -112,10 +113,11 @@ public class Main : MonoBehaviour
         List<Vector2Int> path = new List<Vector2Int>(); 
         List<Vector2Int> dir = new List<Vector2Int>(); 
         (path, dir) = PathGenerator.GeneratePath(start_coords, width_, height_, UnityEngine.Random.Range(height_, width_ * height_), out end_coords);
+        PathGenerator.GeneratePipesFromPath(dir, this, start_coords);
         int count = 0;
         foreach (var p in path)
         {
-            Debug.Log("> path["+ count + "]: " + p.x + ", " + p.y);
+            Debug.Log("> path["+ count + "]: " + p.x + ", " + p.y + ", so: " + grid_.GetGridObj(p.x, p.y).GetCellItem().GetPipeSO().name);
             count++;
         }
         count = 0;
@@ -127,11 +129,11 @@ public class Main : MonoBehaviour
         Debug.Log("> start_coords: " + start_coords.x + ", " + start_coords.y);
         Debug.Log("> end_coords: " + end_coords.x + ", " + end_coords.y);
 
-        PathGenerator.GeneratePipesFromPath(path, this, start_coords);
 
         start_cell_ = grid_.GetGridObj(start_coords.x, start_coords.y);
         start_cell_.GetCellItem().SetIsStartPoint(true);
         start_cell_.GetCellItem().SetPipeSo(startPipeSO);
+        OnPipeSoChanged?.Invoke(this, start_cell_.GetCellItem());
         OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
         {
             pipe = start_cell_.GetCellItem(),
@@ -142,7 +144,7 @@ public class Main : MonoBehaviour
         end_cell_ = grid_.GetGridObj(end_coords.x, end_coords.y);
         end_cell_.GetCellItem().SetIsEndPoint(true);
         end_cell_.GetCellItem().SetPipeSo(endPipeSo);
-
+        OnPipeSoChanged?.Invoke(this, end_cell_.GetCellItem());
         OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
         {
             pipe = end_cell_.GetCellItem(),
@@ -152,8 +154,6 @@ public class Main : MonoBehaviour
         });
 
 
-
-
         OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
         {
             pipe = end_cell_.GetCellItem(),
@@ -161,6 +161,9 @@ public class Main : MonoBehaviour
             y = end_cell_.GetY(),
             color = Color.green
         });
+
+        
+
     }
 
     private void FixedUpdate()
@@ -526,6 +529,12 @@ public class Main : MonoBehaviour
         OnScoreChanged?.Invoke(this, EventArgs.Empty);
 
         return true;
+    }
+
+    public void Invoke_ChangedPipeSO(Pipe pipe)
+    {
+       
+        OnPipeSoChanged?.Invoke(this, pipe);
     }
 
     private void TryDestroyGem(GridCell cell)

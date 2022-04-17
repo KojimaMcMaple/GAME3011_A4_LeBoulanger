@@ -48,18 +48,21 @@ public class PathGenerator : MonoBehaviour
             List<Vector2Int> possible = new List<Vector2Int>() { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
             
             //step one: removing the directions that it cant go in
-            if (currentPos.x <= 0 || currentPos + Vector2Int.left == lastAddedNode)
+            if (currentPos.x <= 0 || currentPos + Vector2Int.left == lastAddedNode || currentPos + Vector2Int.left == startPos)
                 possible.Remove(Vector2Int.left);
-            if (currentPos.x >= width - 1 || currentPos + Vector2Int.right == lastAddedNode)
+            if (currentPos.x >= width - 1 || currentPos + Vector2Int.right == lastAddedNode || currentPos + Vector2Int.right == startPos)
                 possible.Remove(Vector2Int.right);
-            if (currentPos.y <= 0 || currentPos + Vector2Int.down == lastAddedNode)
+            if (currentPos.y <= 0 || currentPos + Vector2Int.down == lastAddedNode || currentPos + Vector2Int.down == startPos)
                 possible.Remove(Vector2Int.down);
-            if (currentPos.y >= height - 1 || currentPos + Vector2Int.up == lastAddedNode)
+            if (currentPos.y >= height - 1 || currentPos + Vector2Int.up == lastAddedNode || currentPos + Vector2Int.down == startPos)
                 possible.Remove(Vector2Int.up);
 
             //Step 2 get a random direction from the remaining directions, we'll use to update the grid position
             if (possible.Count <= 0)
+            {
+                lastAddedNode = currentPos;
                 return (path, dir);
+            }
             int random = Random.Range(0, possible.Count);
             Vector2Int newPos = currentPos + possible[random];
 
@@ -69,7 +72,7 @@ public class PathGenerator : MonoBehaviour
             while (path.Contains(newPos))
             {
                 //escape if theres no space to continue in this direction
-                if (i + overlappingTiles + 1 >= pathLength || OutOfBoundsCheck(newPos + possible[random], width, height))
+                if (i + overlappingTiles + 1 >= pathLength || OutOfBoundsCheck(newPos + possible[random], width, height) || newPos + possible[random] == startPos )
                 {
                     //start over, or return early if no other paths are available
                     while (overlappingTiles > 0)
@@ -80,7 +83,10 @@ public class PathGenerator : MonoBehaviour
                     }
                     possible.Remove(possible[random]);
                     if (possible.Count <= 0)
+                    {
+                        lastAddedNode = currentPos;
                         return (path,dir);
+                    }
 
                     //pick a new direction and we'll see how things got this time
                     random = Random.Range(0, possible.Count);
@@ -100,6 +106,8 @@ public class PathGenerator : MonoBehaviour
             currentPos = newPos;
             lastAddedNode = path[i-1];
         }
+
+        lastAddedNode = currentPos;
         //return dir;        
         return (path, dir);
     }
@@ -113,24 +121,26 @@ public class PathGenerator : MonoBehaviour
         List<Main.Pipe> pipes = new List<Main.Pipe>(path.Count);
         List<PipeSO> pipetypes = gameLogic.pipe_so_list_;
 
-        Main.Pipe lastPipe;
+        Vector2Int lastPipe = startPos;
         
         Grid<Main.GridCell> grid = gameLogic.GetMainGrid();
 
-        lastPipe = grid.GetGridObj(startPos.x, startPos.y)?.GetCellItem();
-        pipes.Add(lastPipe);
         
-        for(int i = 1; i < pipes.Count; i++)
+        
+        for(int i = 0; i < path.Count-1; i++)
         {
-            int newX = path[i].x + lastPipe.Xcoord;
-            int newY = path[i].x + lastPipe.Ycoord;
+            int newX = path[i].x + lastPipe.x;
+            int newY = path[i].y + lastPipe.y;
             
             Main.Pipe nextPipe = grid.GetGridObj(newX, newY)?.GetCellItem();
            
+            if(nextPipe == null)
+                continue;
+
             //check for other pipes with the same coordinates 
-            if(pipes.Contains(nextPipe))
+            if(pipes.Find(pipe => pipe.Xcoord == newX && pipe.Ycoord == newY) != null )
             {
-                if(path[i] == path[i-1]) //straight line through an already existing pipe
+                if(path[i] == path[i+1]) //straight line through an already existing pipe
                     nextPipe.SetPipeSo(pipetypes[3]);
                 else
                     nextPipe.SetPipeSo(pipetypes[2]); //turns while passing into another pipe
@@ -138,15 +148,16 @@ public class PathGenerator : MonoBehaviour
             }
             else
             {
-                if (path[i] == path[i - 1]) //straight line 
+                if (path[i] == path[i + 1]) //straight line 
                     nextPipe.SetPipeSo(pipetypes[0]);
                 else
                     nextPipe.SetPipeSo(pipetypes[1]); //turning pipe
 
                 pipes.Add(nextPipe);
             }
-
-            lastPipe = nextPipe;
+            Debug.Log("pipe " + nextPipe.GetGridCoord() + " is now a " + nextPipe.GetPipeSO());
+            gameLogic.Invoke_ChangedPipeSO(nextPipe);
+            lastPipe = nextPipe.GetGridCoord();
         }
 
         return pipes;
