@@ -58,7 +58,7 @@ public class View : MonoBehaviour
         state_ = State.kBusy;
         Init(FindObjectOfType<Main>(), FindObjectOfType<Main>().GetMainGrid());
 
-        player_lv_txt_.text = "Skill Lv: " + model_.GetPlayerLevel() + "\n-Extra time: " + model_.GetExtraTimeFromPlayerLevel(model_.GetLevelTimeLimit());
+        player_lv_txt_.text = "Skill Lv: " + model_.GetPlayerLevel() + "\n-Extra time for \nthis level: " + model_.GetExtraTimeFromPlayerLevel(model_.GetLevelTimeLimit()) + "s";
         model_.OnTimerChanged += HandleTimerChangedEvent;
     }
 

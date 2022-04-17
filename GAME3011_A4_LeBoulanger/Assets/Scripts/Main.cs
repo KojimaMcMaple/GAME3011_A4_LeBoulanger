@@ -61,6 +61,7 @@ public class Main : MonoBehaviour
         {
             width_ = 6;
             height_ = 6;
+            player_level_ = 1;
             level_time_limit_ = 300f;
             timer_ = level_time_limit_;
             timer_ += GetExtraTimeFromPlayerLevel(timer_);
@@ -69,6 +70,7 @@ public class Main : MonoBehaviour
         {
             width_ = 8;
             height_ = 8;
+            player_level_ = 2;
             level_time_limit_ = 250f;
             timer_ = level_time_limit_;
             timer_ += GetExtraTimeFromPlayerLevel(timer_);
@@ -77,6 +79,7 @@ public class Main : MonoBehaviour
         {
             width_ = 10;
             height_ = 10;
+            player_level_ = 3;
             level_time_limit_ = 200f;
             timer_ = level_time_limit_;
             timer_ += GetExtraTimeFromPlayerLevel(timer_);
