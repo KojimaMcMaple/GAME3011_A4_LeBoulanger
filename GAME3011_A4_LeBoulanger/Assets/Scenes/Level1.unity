@@ -1412,6 +1412,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a66843417d46d9b46bccda94c6c75df7, type: 2}
   - {fileID: 11400000, guid: 80bb89c5c0f2bcd4d967d3e7abbd01ee, type: 2}
   - {fileID: 11400000, guid: 7ed7ca64170f19f42882eb4725cb8674, type: 2}
+  startPipeSO: {fileID: 11400000, guid: 311ea09d0c33a3e49b8552bc941e2541, type: 2}
+  endPipeSo: {fileID: 11400000, guid: 865456079db9db84c83f15c2a7e22a7a, type: 2}
   can_spawn_bomb_: 0
 --- !u!82 &1097157808
 AudioSource:
