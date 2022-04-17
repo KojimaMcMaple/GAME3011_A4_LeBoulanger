@@ -1416,6 +1416,8 @@ MonoBehaviour:
   startPipeSO: {fileID: 11400000, guid: 311ea09d0c33a3e49b8552bc941e2541, type: 2}
   endPipeSo: {fileID: 11400000, guid: 865456079db9db84c83f15c2a7e22a7a, type: 2}
   can_spawn_bomb_: 0
+  ActiveColor: {r: 1, g: 1, b: 1, a: 1}
+  inactiveColor: {r: 0.25882354, g: 0.3764706, b: 0.06666667, a: 0.9647059}
 --- !u!82 &1097157808
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2476,7 +2478,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: (Find path to Green pipe to win)
+  m_text: (Find path to other nub to win)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
