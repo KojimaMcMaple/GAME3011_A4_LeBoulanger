@@ -49,6 +49,7 @@ public class Main : MonoBehaviour
     private int score_;
     private float level_time_limit_ = 300f;
     private float timer_ = 300f;
+    private bool is_victory = false;
     private int player_level_ = 1;
     private int max_immoveables_ = 5;
     private int num_immoveables_ = 0;
@@ -56,13 +57,14 @@ public class Main : MonoBehaviour
 
     private void Awake()
     {
+        is_victory = false;
         Scene curr_scene = SceneManager.GetActiveScene();
         if (curr_scene.name == "Level1")
         {
             width_ = 6;
             height_ = 6;
             player_level_ = 1;
-            level_time_limit_ = 300f;
+            level_time_limit_ = 90f;
             timer_ = level_time_limit_;
             timer_ += GetExtraTimeFromPlayerLevel(timer_);
         }
@@ -71,7 +73,7 @@ public class Main : MonoBehaviour
             width_ = 8;
             height_ = 8;
             player_level_ = 2;
-            level_time_limit_ = 250f;
+            level_time_limit_ = 60f;
             timer_ = level_time_limit_;
             timer_ += GetExtraTimeFromPlayerLevel(timer_);
         }
@@ -80,7 +82,7 @@ public class Main : MonoBehaviour
             width_ = 10;
             height_ = 10;
             player_level_ = 3;
-            level_time_limit_ = 200f;
+            level_time_limit_ = 30f;
             timer_ = level_time_limit_;
             timer_ += GetExtraTimeFromPlayerLevel(timer_);
         }
@@ -141,8 +143,11 @@ public class Main : MonoBehaviour
     {
         if (timer_ > 0)
         {
-            timer_ -= Time.deltaTime;
-            OnTimerChanged?.Invoke(this, EventArgs.Empty);
+            if (!is_victory)
+            {
+                timer_ -= Time.deltaTime;
+                OnTimerChanged?.Invoke(this, EventArgs.Empty);
+            }
         }
         else
         {
@@ -363,6 +368,10 @@ public class Main : MonoBehaviour
             });
         }
 
+        if (result)
+        {
+            is_victory = true;
+        }
         return result;
     }
 
