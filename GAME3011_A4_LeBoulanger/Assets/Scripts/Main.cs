@@ -116,19 +116,17 @@ public class Main : MonoBehaviour
 
         start_cell_ = grid_.GetGridObj(start_coords.x, start_coords.y);
         start_cell_.GetCellItem().SetIsStartPoint(true);
-        //start_cell_.GetCellItem().SetPipeSo(startPipeSO);
+        start_cell_.GetCellItem().SetPipeSo(startPipeSO);
 
         end_cell_ = grid_.GetGridObj(end_coords.x, end_coords.y);
         end_cell_.GetCellItem().SetIsEndPoint(true);
-        //end_cell_.GetCellItem().SetPipeSo(endPipeSo);
+        end_cell_.GetCellItem().SetPipeSo(endPipeSo);
 
         score_ = 0;
     }
 
     private void Start()
     {
-        start_cell_.GetCellItem().SetPipeSo(startPipeSO);
-        OnPipeSoChanged?.Invoke(this, start_cell_.GetCellItem());
         OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
         {
             pipe = start_cell_.GetCellItem(),
@@ -136,10 +134,6 @@ public class Main : MonoBehaviour
             y = start_cell_.GetY(),
             color = Color.blue
         });
-        end_cell_ = grid_.GetGridObj(end_coords.x, end_coords.y);
-        end_cell_.GetCellItem().SetIsEndPoint(true);
-        end_cell_.GetCellItem().SetPipeSo(endPipeSo);
-        OnPipeSoChanged?.Invoke(this, end_cell_.GetCellItem());
         OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
         {
             pipe = end_cell_.GetCellItem(),
@@ -147,18 +141,6 @@ public class Main : MonoBehaviour
             y = end_cell_.GetY(),
             color = Color.green
         });
-
-
-        OnGridCellChanged?.Invoke(this, new OnGridCellChangedEventArgs
-        {
-            pipe = end_cell_.GetCellItem(),
-            x = end_cell_.GetX(),
-            y = end_cell_.GetY(),
-            color = Color.green
-        });
-
-        
-
     }
 
     private void FixedUpdate()
@@ -942,9 +924,9 @@ public class Main : MonoBehaviour
             {
                 case GlobalEnums.LineTileType.Nub:
                     if (rot_type_ == GlobalEnums.RotType.Rot0) bitmask_ = GlobalEnums.kBitmaskBottom;
-                    if (rot_type_ == GlobalEnums.RotType.Rot90) bitmask_ = GlobalEnums.kBitmaskRight;
+                    if (rot_type_ == GlobalEnums.RotType.Rot90) bitmask_ = GlobalEnums.kBitmaskLeft;
                     if (rot_type_ == GlobalEnums.RotType.Rot180) bitmask_ = GlobalEnums.kBitmaskTop;
-                    if (rot_type_ == GlobalEnums.RotType.Rot270) bitmask_ = GlobalEnums.kBitmaskLeft;
+                    if (rot_type_ == GlobalEnums.RotType.Rot270) bitmask_ = GlobalEnums.kBitmaskRight;
                     break;
                 case GlobalEnums.LineTileType.Line:
                     if (rot_type_ == GlobalEnums.RotType.Rot0 || rot_type_ == GlobalEnums.RotType.Rot180) bitmask_ = GlobalEnums.kBitmaskTop | GlobalEnums.kBitmaskBottom;
